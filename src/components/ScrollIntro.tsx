@@ -166,9 +166,9 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         { h: true, c: r.y - 1, f: r.x, t: vw, w: [0.05, 0.65] },
         { h: false, c: rx, f: r.y, t: vh, w: [0.02, 0.62] },
         { h: true, c: by, f: rx, t: 0, w: [0.07, 0.67] },
-        // growth into the full page lines while the box becomes the hero
-        { h: false, c: r.x - 1, f: by, t: vh, w: [2.3, 2.8], sc: true },
-        { h: true, c: by, f: rx, t: vw, w: [2.35, 2.85], sc: true },
+        // the other halves of the box-edge lines: drawn with the rest in the opening, so the lines are complete from the first view and later only move
+        { h: false, c: r.x - 1, f: by, t: vh, w: [0.1, 0.6] },
+        { h: true, c: by, f: rx, t: vw, w: [0.12, 0.62] },
       ];
       if (!mob) {
         // one grid for the whole intro. It is drawn once in the opening view (a bar runs each line in) and never taken back:
@@ -183,7 +183,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
           { h: true, c: m(Y(285), Y(285), hy), f: 0, t: r.x, w: [0.2, 0.75] },
           { h: true, c: m(Y(517), Y(472), hb), f: 0, t: r.x, w: [0.25, 0.8] },
           { h: true, c: m(Y(540), Y(540), hy), f: vw, t: rx, w: [0.3, 0.85] },
-          { h: false, c: m(X(1123), X(1093), vw), f: m(vh, vh, hb), t: m(Y(540), Y(540), hy), w: [0.35, 0.9] },
+          { h: false, c: m(X(1123), X(1093), vw), f: vh, t: m(Y(540), Y(540), hy), w: [0.35, 0.9] },
         );
       }
       const nowT = performance.now(), dts = Math.min(0.064, (nowT - lt) / 1000); lt = nowT; anim = false;
