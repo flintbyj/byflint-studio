@@ -8,12 +8,12 @@ export const cases = [
 ];
 
 export const logos = [
-  { src: "/logos/indofast.png", alt: "Indofast Energy" },
-  { src: "/logos/vlcc.png", alt: "VLCC" },
-  { src: "/logos/zeroharm.png", alt: "Zeroharm" },
-  { src: "/logos/navoma.png", alt: "Navoma" },
-  { src: "/logos/fellafeeds.png", alt: "FellaFeeds" },
-  { src: "/logos/ethnicandaz.png", alt: "Ethnic Andaz" },
+  { src: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logos/indofast.png`, alt: "Indofast Energy" },
+  { src: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logos/vlcc.png`, alt: "VLCC" },
+  { src: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logos/zeroharm.png`, alt: "Zeroharm" },
+  { src: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logos/navoma.png`, alt: "Navoma" },
+  { src: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logos/fellafeeds.png`, alt: "FellaFeeds" },
+  { src: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logos/ethnicandaz.png`, alt: "Ethnic Andaz" },
 ];
 
 export const services = [
@@ -37,9 +37,9 @@ export const problems = [
 
 export const testimonials = {
   indofast: { quote: "Flint designed our operator app around how people actually work at a station: one question per screen, big buttons, and a selfie only once per shift. They tested with us regularly, and it showed in the final app.",
-    name: "Ravi Bilochi", role: "Vice President of Technology, Indofast Energy", logo: "/logos/indofast.png", alt: "Indofast Energy", stat: "96.4%", statLabel: "of stations monitored in real time" },
+    name: "Ravi Bilochi", role: "Vice President of Technology, Indofast Energy", logo: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logos/indofast.png`, alt: "Indofast Energy", stat: "96.4%", statLabel: "of stations monitored in real time" },
   vlcc: { quote: "Flint went into our stores to understand why sales had stalled, then designed a skin analyser customers could use on their own. Daily sales in the stores we tested roughly tripled.",
-    name: "Harsh Yadav", role: "Senior Product Lead, VLCC", logo: "/logos/vlcc.png", alt: "VLCC", stat: "~3x", statLabel: "daily sales in the stores tested" },
+    name: "Harsh Yadav", role: "Senior Product Lead, VLCC", logo: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logos/vlcc.png`, alt: "VLCC", stat: "~3x", statLabel: "daily sales in the stores tested" },
 };
 
 export const faq = [
