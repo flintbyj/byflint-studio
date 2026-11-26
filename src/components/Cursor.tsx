@@ -20,10 +20,10 @@ export function Cursor() {
     fit();
     const spark = (px: number, py: number, dx: number, dy: number) => {
       const sp = Math.hypot(dx, dy); if (sp < 2 || reduce || document.documentElement.classList.contains("cur-text")) return;
-      const n = Math.min(5, 2 + Math.floor(sp / 16));
-      for (let i = 0; i < n && ps.length < 140; i++) {
-        const a = Math.atan2(dy, dx) + Math.PI + (Math.random() - 0.5) * 2.2, v = 0.6 + Math.random() * 2.4 + sp * 0.04;
-        ps.push({ x: px, y: py, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, max: 520 + Math.random() * 480, len: 9 + Math.random() * 12, kind: Math.random() < 0.18 ? 2 : Math.random() < 0.3 ? 1 : 0, rot: Math.random() * Math.PI * 2, vr: (Math.random() - 0.5) * 0.12 });
+      const n = Math.min(6, 2 + Math.floor(sp / 14));
+      for (let i = 0; i < n && ps.length < 160; i++) {
+        const a = Math.atan2(dy, dx) + Math.PI + (Math.random() - 0.5) * 2.6, v = 1.6 + Math.random() * 4.2 + sp * 0.06, r = Math.random();
+        ps.push({ x: px, y: py, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, max: r < 0.14 ? 650 + Math.random() * 450 : 280 + Math.random() * 380, len: r < 0.14 ? 6 + Math.random() * 8 : 10 + Math.random() * 24, kind: r < 0.14 ? 1 : r < 0.3 ? 2 : 0, rot: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 0.05 });
       }
       if (!sraf) { last = performance.now(); sraf = requestAnimationFrame(frame); }
     };
@@ -34,29 +34,31 @@ export function Cursor() {
       for (let i = ps.length - 1; i >= 0; i--) {
         const p = ps[i]; p.life += dt;
         if (p.life >= p.max) { ps.splice(i, 1); continue; }
-        const k = dt / 16; p.x += p.vx * k; p.y += p.vy * k; p.vx *= Math.pow(0.94, k); p.vy *= Math.pow(0.94, k);
-        const t = p.life / p.max, al = Math.pow(1 - t, 1.3), sp = Math.hypot(p.vx, p.vy) || 1, sc = 1 - t * 0.55;
-        p.rot += p.vr * k;
-        const col = t < 0.2 ? "#FFFFFF" : "#F1FF63";
-        const bar = (x1: number, y1: number, x2: number, y2: number, w: number) => {
-          g.lineCap = "round"; g.lineJoin = "round";
-          g.globalAlpha = al * 0.55; g.strokeStyle = "#202329"; g.lineWidth = (w + 2.6) * dpr; // dark edge so it reads on light grounds
-          g.beginPath(); g.moveTo(x1 * dpr, y1 * dpr); g.lineTo(x2 * dpr, y2 * dpr); g.stroke();
-          g.globalAlpha = al; g.strokeStyle = col; g.lineWidth = w * dpr;
-          g.beginPath(); g.moveTo(x1 * dpr, y1 * dpr); g.lineTo(x2 * dpr, y2 * dpr); g.stroke();
+        const k = dt / 16;
+        const t = p.life / p.max, al = Math.pow(1 - t, 0.9), sp = Math.hypot(p.vx, p.vy) || 1;
+        p.vy += 0.02 * k; p.rot += p.vr * k;
+        // a hair-thin tapered line: bright at the head, tapering to nothing, with a faint dark edge so it reads on light grounds
+        const tap = (x1: number, y1: number, x2: number, y2: number, w: number, hot: string, tail: string) => {
+          const dx = x2 - x1, dy = y2 - y1, d = Math.hypot(dx, dy) || 1, nx = -dy / d * w / 2, ny = dx / d * w / 2;
+          g.globalAlpha = al * 0.4; g.fillStyle = "#202329";
+          g.beginPath(); g.moveTo((x1 + nx * 1.9) * dpr, (y1 + ny * 1.9) * dpr); g.lineTo(x2 * dpr, y2 * dpr); g.lineTo((x1 - nx * 1.9) * dpr, (y1 - ny * 1.9) * dpr); g.closePath(); g.fill();
+          const gr = g.createLinearGradient(x1 * dpr, y1 * dpr, x2 * dpr, y2 * dpr); gr.addColorStop(0, hot); gr.addColorStop(1, tail);
+          g.globalAlpha = al; g.fillStyle = gr;
+          g.beginPath(); g.moveTo((x1 + nx) * dpr, (y1 + ny) * dpr); g.lineTo(x2 * dpr, y2 * dpr); g.lineTo((x1 - nx) * dpr, (y1 - ny) * dpr); g.closePath(); g.fill();
         };
-        if (p.kind === 0) { // a thick rounded streak, like one bar of the mark
-          const L = p.len * sc, ux = p.vx / sp, uy = p.vy / sp;
-          bar(p.x, p.y, p.x - ux * L, p.y - uy * L, 4.2 * sc + 0.8);
-        } else if (p.kind === 1) { // a round ember
-          bar(p.x, p.y, p.x + 0.01, p.y, (4.5 + p.len * 0.25) * sc);
-        } else { // a glint drawn like the Flint mark: bars on a cross, one short diagonal, a dot at the centre
-          const u = p.len * 1.15 * sc, c0 = Math.cos(p.rot), s0 = Math.sin(p.rot);
-          const pt = (a: number, b: number) => [p.x + a * c0 - b * s0, p.y + a * s0 + b * c0];
-          const seg = (a1: number, b1: number, a2: number, b2: number) => { const A = pt(a1, b1), B = pt(a2, b2); bar(A[0], A[1], B[0], B[1], 3.2 * sc + 0.6); };
-          seg(0, -u * 0.95, 0, -u * 0.45); seg(-u * 0.95, 0, -u * 0.45, 0); seg(u * 0.45, 0, u * 0.95, 0); seg(0, u * 0.45, 0, u * 1.0);
-          seg(u * 0.3, u * 0.3, u * 0.55, u * 0.55); bar(p.x, p.y, p.x + 0.01, p.y, 3.4 * sc);
+        const hot = t < 0.3 ? "#FFFFFF" : "#FFF1A6", tail = "#F1FF63";
+        if (p.kind !== 1) {
+          const L = p.len * (1 - t * 0.6), ux = p.vx / sp, uy = p.vy / sp;
+          tap(p.x, p.y, p.x - ux * L, p.y - uy * L, p.kind === 2 ? 1.4 : 2.6, hot, tail);
+        } else { // a four-point sparkle with long thin rays that twinkles as it fades
+          const tw = 0.65 + 0.35 * Math.sin(p.life * 0.03), u = p.len * tw * (1 - t * 0.5), c0 = Math.cos(p.rot), s0 = Math.sin(p.rot);
+          for (let q = 0; q < 4; q++) {
+            const a = q * Math.PI / 2, ca = Math.cos(a), sa = Math.sin(a), L = q % 2 ? u * 0.62 : u;
+            tap(p.x, p.y, p.x + (ca * c0 - sa * s0) * L, p.y + (ca * s0 + sa * c0) * L, 2.2, "#FFFFFF", tail);
+          }
+          g.globalAlpha = al; g.fillStyle = "#FFFFFF"; g.beginPath(); g.arc(p.x * dpr, p.y * dpr, 1.6 * dpr, 0, Math.PI * 2); g.fill();
         }
+        p.x += p.vx * k; p.y += p.vy * k; p.vx *= Math.pow(0.9, k); p.vy *= Math.pow(0.9, k);
       }
       g.globalAlpha = 1;
       sraf = ps.length ? requestAnimationFrame(frame) : 0;
