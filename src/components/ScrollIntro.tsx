@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { Mark } from "./Mark";
-import { cases } from "@/lib/content";
 
 type R = { x: number; y: number; w: number; h: number };
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -25,16 +24,15 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
   const wrap = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const box = useRef<HTMLDivElement>(null);
-  const prev = useRef<HTMLDivElement>(null);
   const logo = useRef<HTMLSpanElement>(null);
   const txtR = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
-    const w = wrap.current!, st = stage.current!, b = box.current!, pv = prev.current!, lg = logo.current!, tx = txtR.current!;
+    const w = wrap.current!, st = stage.current!, b = box.current!, lg = logo.current!, tx = txtR.current!;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { w.classList.add("sx-off"); return; }
     w.classList.add("sx-on");
     const q = (s: string) => st.querySelector(s) as HTMLElement;
-    const lnT = q(".sx-lt"), lnB = q(".sx-lb"), lnL = q(".sx-ll"), lnR = q(".sx-lr"), cH = q(".sx-ch"), cV = q(".sx-cv");
+    const lnT = q(".sx-lt"), lnB = q(".sx-lb"), lnL = q(".sx-ll"), lnR = q(".sx-lr");
     const bH1 = q(".sx-h1"), bH2 = q(".sx-h2"), bV1 = q(".sx-v1"), bV2 = q(".sx-v2");
     let cur = 0, raf = 0, ld = 1, lraf = 0;
     const root = document.documentElement;
@@ -92,10 +90,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
       lnB.style.transform = `translateY(${r.y + r.h}px)`;
       lnL.style.transform = `translateX(${r.x - 1}px)`;
       lnR.style.transform = `translateX(${r.x + r.w}px)`;
-      const cs = Math.min(131 * (mob ? 0.6 : k), s2.h * 0.3);
-      const cellOn = seg(p, 0.25, 0.45) * (1 - seg(p, 0.5, 0.62));
-      cH.style.cssText = `transform:translate(${r.x}px,${r.y + cs}px);width:${r.w}px;opacity:${cellOn}`;
-      cV.style.cssText = `transform:translate(${r.x + cs}px,${r.y}px);height:${cs}px;opacity:${cellOn}`;
+      const cs = Math.min(131 * (mob ? 0.6 : k), s2.h * 0.3); // logo cell size, used only to centre the mark
 
       // the Flint mark: inside the box (frame 1) -> centred in the logo cell (frame 2) -> nav (frame 3)
       const f1 = mob ? 1.2 : (56.45 * k) / MW, f2 = mob ? 0.8 : k;
@@ -150,11 +145,6 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
       bV1.style.transform = `translate(${r.x - 3}px,${v1y}px)`;
       bV2.style.transform = `translate(${rx - 3}px,${v2y}px)`;
 
-      pv.style.top = vh - pv.offsetHeight - vh * 0.06 + "px";
-      const pin = ease(seg(p, 0.22, 0.45)), pout = seg(p, 0.55, 0.72);
-      pv.style.opacity = String(pin * (1 - pout));
-      pv.style.transform = `translate(${(1 - pin) * 40}px,${(1 - pin) * 60 + pout * -20}px)`;
-
       st.style.setProperty("--sxr", String(seg(p, 0.86, 0.98)));
       st.style.setProperty("--sxo", String(1 - seg(p, 0.93, 1)));
       w.classList.toggle("sx-done", p >= 0.999);
@@ -194,14 +184,9 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         <div className="sx-fx" aria-hidden="true">
           <span className="sx-ln sx-h sx-lt" /><span className="sx-ln sx-h sx-lb" />
           <span className="sx-ln sx-v sx-ll" /><span className="sx-ln sx-v sx-lr" />
-          <span className="sx-cl sx-ch" /><span className="sx-cl sx-cv" />
           <div className="sx-box" ref={box}>
           </div>
           <span className="sx-bar sx-bh sx-h1" /><span className="sx-bar sx-bh sx-h2" /><span className="sx-bar sx-bv sx-v1" /><span className="sx-bar sx-bv sx-v2" />
-          <div className="sx-prev" ref={prev}>
-            <div className="t" style={{ background: cases[0].bg }}><p className="co">{cases[0].company}</p><p className="s">{cases[0].before}<b>{cases[0].brand}</b>{cases[0].after}</p></div>
-            <div className="ph" />
-          </div>
         </div>
         <h1 className="sx-txt" ref={txtR} aria-hidden="true">Design Bandwidth<br />for startups and scale-ups.<br /><span>Shipped in code.</span></h1>
         <span className="sx-logo" ref={logo} aria-hidden="true"><Mark width={MW} height={MH} /></span>
