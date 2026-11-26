@@ -184,8 +184,10 @@ a{color:#202329}a:hover{color:#000}
 .sx-logo{position:absolute;left:0;top:0;z-index:41;display:none;transform-origin:0 0;pointer-events:none;color:#F1FF63;will-change:transform}
 .sx-on .sx-logo{display:inline-flex}.sx-done .sx-logo{visibility:hidden}
 .sx-on:not(.sx-done) .nav .logo{visibility:hidden}
-.sx-box p{opacity:var(--sxtx,1);font-size:var(--sxf,42px);font-weight:600;line-height:1.2;color:var(--sxt,#FBFAF9)}
-.sx-box p span{color:var(--sxs,#999B93)}
+.sx-txt{position:absolute;left:0;top:0;margin:0;z-index:41;display:none;font-weight:600;line-height:1.2;letter-spacing:-.01em;pointer-events:none}
+.sx-on .sx-txt{display:block}.sx-done .sx-txt{visibility:hidden}
+.sx-txt span{color:var(--sxs,#999B93)}
+.sx-on:not(.sx-done) .hero h1{visibility:hidden}
 .sx-bar{position:absolute;left:0;top:0;background:var(--ink);z-index:3;will-change:transform}
 .sx-bar.sx-bh{width:46px;height:6px}.sx-bar.sx-bv{width:6px;height:46px}
 .sx-prev{position:absolute;right:4%;top:0;z-index:4;display:flex;width:min(340px,42vw);height:min(190px,24vw);opacity:0;box-shadow:0 0 0 1px var(--line)}

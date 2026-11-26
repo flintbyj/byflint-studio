@@ -27,9 +27,10 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
   const box = useRef<HTMLDivElement>(null);
   const prev = useRef<HTMLDivElement>(null);
   const logo = useRef<HTMLSpanElement>(null);
+  const txtR = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
-    const w = wrap.current!, st = stage.current!, b = box.current!, pv = prev.current!, lg = logo.current!;
+    const w = wrap.current!, st = stage.current!, b = box.current!, pv = prev.current!, lg = logo.current!, tx = txtR.current!;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { w.classList.add("sx-off"); return; }
     w.classList.add("sx-on");
     const q = (s: string) => st.querySelector(s) as HTMLElement;
@@ -70,14 +71,26 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
       b.style.width = r.w + "px";
       b.style.height = r.h + "px";
       b.style.background = mix(INK, BG, a);
-      b.style.setProperty("--sxt", mix(BG, INK, a));
-      b.style.setProperty("--sxs", mix(GREY, MUT, a));
-      const fs1 = mob ? 30 : 42 * k, fs2 = mob ? 24 : 32 * k, fs3 = mob ? 30 : Math.min(42, Math.max(28, vw * 0.033));
-      b.style.setProperty("--sxf", (first ? lerp(fs1, fs2, a) : lerp(fs2, fs3, c)) + "px");
+      // one headline for the whole intro: rides in the box, then lands exactly on the hero's own h1 (which stays hidden until then)
+      const hh = q(".hero h1"), hr = hh?.getBoundingClientRect();
+      const hFs = hh ? parseFloat(getComputedStyle(hh).fontSize) : 42;
+      const H = hr ? { x: hr.left - sr.left, b: hr.bottom - sr.top, w: hr.width } : { x: s3.x + 42, b: s3.y + s3.h - 42, w: 570 };
+      const pad = mob ? 20 : 42 * k;
+      const fs1 = mob ? 30 : 42 * k, fs2 = mob ? 24 : 32 * k;
+      let tX: number, tB: number, tW: number, tF: number;
+      if (first) { tX = r.x + pad; tB = r.y + r.h - pad; tW = r.w - 2 * pad; tF = lerp(fs1, fs2, a); }
+      else { tX = lerp(s2.x + pad, H.x, c); tB = lerp(s2.y + s2.h - pad, H.b, c); tW = lerp(s2.w - 2 * pad, H.w, c); tF = lerp(fs2, hFs, c); }
+      tx.style.fontSize = tF + "px";
+      tx.style.width = tW + "px";
+      tx.style.whiteSpace = mob ? "normal" : "nowrap";
+      tx.style.color = mix(BG, INK, a);
+      tx.style.setProperty("--sxs", mix(GREY, MUT, a));
+      tx.style.left = tX + "px";
+      tx.style.top = tB - tx.getBoundingClientRect().height + "px";
 
-      lnT.style.transform = `translateY(${r.y}px)`;
+      lnT.style.transform = `translateY(${r.y - 1}px)`;
       lnB.style.transform = `translateY(${r.y + r.h}px)`;
-      lnL.style.transform = `translateX(${r.x}px)`;
+      lnL.style.transform = `translateX(${r.x - 1}px)`;
       lnR.style.transform = `translateX(${r.x + r.w}px)`;
       const cs = Math.min(131 * (mob ? 0.6 : k), s2.h * 0.3);
       const cellOn = seg(p, 0.25, 0.45) * (1 - seg(p, 0.5, 0.62));
@@ -123,19 +136,19 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         lnR.style.clipPath = `inset(${clampN(Math.min(v2y / vh, 1 - settle) * 100)}% 0 0 0)`;
         lnB.style.clipPath = `inset(0 0 0 ${clampN(((h1x * (1 - settle)) / vw) * 100)}%)`;
         lnT.style.clipPath = `inset(0 ${clampN(100 - ((lerp(h2x + 46, vw, settle)) / vw) * 100)}% 0 0)`;
-        const rv = ease(seg(ld, 0.55, 0.85)), tx = ease(seg(ld, 0.8, 1));
+        const rv = ease(seg(ld, 0.55, 0.85)), tf = ease(seg(ld, 0.8, 1));
         b.style.clipPath = `inset(${clampN((1 - rv) * 100)}% 0 0 0)`;
-        b.style.setProperty("--sxtx", String(tx));
-        lg.style.opacity = String(tx);
+        tx.style.opacity = String(tf);
+        lg.style.opacity = String(tf);
       } else {
         for (const el of [lnL, lnR, lnT, lnB, b]) el.style.clipPath = "";
-        b.style.setProperty("--sxtx", "1");
+        tx.style.opacity = "1";
         lg.style.opacity = "1";
       }
       bH1.style.transform = `translate(${h1x}px,${by - 2.5}px)`;
-      bH2.style.transform = `translate(${h2x}px,${r.y - 2.5}px)`;
-      bV1.style.transform = `translate(${r.x - 2.5}px,${v1y}px)`;
-      bV2.style.transform = `translate(${rx - 2.5}px,${v2y}px)`;
+      bH2.style.transform = `translate(${h2x}px,${r.y - 3.5}px)`;
+      bV1.style.transform = `translate(${r.x - 3}px,${v1y}px)`;
+      bV2.style.transform = `translate(${rx - 3}px,${v2y}px)`;
 
       pv.style.top = vh - pv.offsetHeight - vh * 0.06 + "px";
       const pin = ease(seg(p, 0.22, 0.45)), pout = seg(p, 0.55, 0.72);
@@ -183,7 +196,6 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
           <span className="sx-ln sx-v sx-ll" /><span className="sx-ln sx-v sx-lr" />
           <span className="sx-cl sx-ch" /><span className="sx-cl sx-cv" />
           <div className="sx-box" ref={box}>
-            <p>Design Bandwidth<br />for startups and scale-ups.<br /><span>Shipped in code.</span></p>
           </div>
           <span className="sx-bar sx-bh sx-h1" /><span className="sx-bar sx-bh sx-h2" /><span className="sx-bar sx-bv sx-v1" /><span className="sx-bar sx-bv sx-v2" />
           <div className="sx-prev" ref={prev}>
@@ -191,6 +203,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
             <div className="ph" />
           </div>
         </div>
+        <h1 className="sx-txt" ref={txtR} aria-hidden="true">Design Bandwidth<br />for startups and scale-ups.<br /><span>Shipped in code.</span></h1>
         <span className="sx-logo" ref={logo} aria-hidden="true"><Mark width={MW} height={MH} /></span>
       </div>
       <div className="sx-sp" aria-hidden="true" />
