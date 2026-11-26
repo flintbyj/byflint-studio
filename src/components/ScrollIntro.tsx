@@ -42,9 +42,10 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
   const logo = useRef<HTMLSpanElement>(null);
   const txtR = useRef<HTMLHeadingElement>(null);
   const stR = useRef<HTMLParagraphElement>(null);
+  const st2R = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
-    const w = wrap.current!, st = stage.current!, b = box.current!, lg = logo.current!, tx = txtR.current!, sm = stR.current!;
+    const w = wrap.current!, st = stage.current!, b = box.current!, lg = logo.current!, tx = txtR.current!, sm = stR.current!, sm2 = st2R.current!;
     const lf = lg.querySelector<SVGGElement>(".sx-lf")!, lo = lg.querySelector<SVGGElement>(".sx-lo")!;
     const los = Array.from(lo.children) as SVGElement[];
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { w.classList.add("sx-off"); return; }
@@ -134,6 +135,15 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         sm.style.top = r.y + (mob ? 104 : 132 * k) + "px";
         sm.style.clipPath = gone > 0 ? `inset(${clampN(gone * 100)}% 0 0 0)` : `inset(0 0 ${clampN((1 - rvl) * 100)}% 0)`;
         sm.style.visibility = gone >= 1 ? "hidden" : "";
+        // second statement: it writes in as the first one is wiped away, holds in frame 2, then wipes away as the box heads for the hero
+        const inB = first ? ease(seg(a, 0.3, 0.8)) : 1 - ease(seg(c, 0, 0.3));
+        sm2.style.fontSize = (mob ? 20 : 26 * k) + "px";
+        sm2.style.width = (r.w - 2 * pad) * (mob ? 1 : 0.78) + "px";
+        sm2.style.left = r.x + pad + "px";
+        sm2.style.top = r.y + (mob ? 104 : 132 * k) + "px";
+        sm2.style.color = `rgb(${INK})`;
+        sm2.style.clipPath = first ? `inset(0 0 ${clampN((1 - inB) * 100)}% 0)` : `inset(${clampN((1 - inB) * 100)}% 0 0 0)`;
+        sm2.style.visibility = inB <= 0 ? "hidden" : "";
       }
 
       const cs = Math.min(131 * (mob ? 0.6 : k), s2.h * 0.3); // logo cell size, used only to centre the mark
@@ -327,6 +337,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
           <span className="sx-bar sx-bv sx-v1" /><span className="sx-bar sx-bv sx-v2" />
         </div>
         <p className="sx-st" ref={stR} aria-hidden="true">At Flint, websites and products are built for growth and conversion.</p>
+        <p className="sx-st sx-st2" ref={st2R} aria-hidden="true">We design bandwidth for startups and scale-ups.</p>
         <h1 className="sx-txt" ref={txtR} aria-hidden="true">Design Bandwidth<br />for startups and scale-ups.<br /><span>Shipped in code.</span></h1>
         <span className="sx-logo" ref={logo} aria-hidden="true">
           <svg width={MW} height={MH} viewBox="0 0 168 204" style={{ overflow: "visible" }}>
