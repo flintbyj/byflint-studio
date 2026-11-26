@@ -1,19 +1,14 @@
 "use client";
 import { useEffect, useRef } from "react";
 
-/* The cursor is a small four-point glint, the shape a flint throws. It leaves a few tiny glints behind as it moves,
+/* The cursor is a small fan of thin lines, a spark drawn the way the mark is. It throws a few short lines behind as it moves,
    grows over anything clickable and throws a short burst of rays on click. It inverts against whatever is under it,
    so it reads on light and dark. Fine pointers only. */
-const star = (g: CanvasRenderingContext2D, x: number, y: number, r: number, rot: number) => {
-  g.beginPath();
-  for (let i = 0; i < 4; i++) {
-    const a = rot + (i * Math.PI) / 2, b = a + Math.PI / 4, na = a + Math.PI / 2;
-    const tx = x + Math.cos(a) * r, ty = y + Math.sin(a) * r, cx = x + Math.cos(b) * r * 0.16, cy = y + Math.sin(b) * r * 0.16;
-    if (i === 0) g.moveTo(tx, ty);
-    g.quadraticCurveTo(cx, cy, x + Math.cos(na) * r, y + Math.sin(na) * r);
-  }
-  g.closePath(); g.fill();
+const ln = (g: CanvasRenderingContext2D, x: number, y: number, a: number, from: number, to: number) => {
+  g.beginPath(); g.moveTo(x + Math.cos(a) * from, y + Math.sin(a) * from); g.lineTo(x + Math.cos(a) * to, y + Math.sin(a) * to); g.stroke();
 };
+// the spark is made of lines, like the mark: a small fan of thin rounded strokes of different lengths
+const FAN = [-1.92, -1.31, -0.7, -0.09], FLEN = [6, 10, 7, 4];
 
 export function Cursor() {
   const dot = useRef<HTMLCanvasElement>(null);
@@ -41,15 +36,18 @@ export function Cursor() {
       const dt = Math.min(48, now - last); last = now; const k = dt / 16;
       // the cursor glint follows exactly; its size and turn ease toward the hover state
       cx += (x - cx) * (reduce ? 1 : 0.5); cy += (y - cy) * (reduce ? 1 : 0.5);
-      const ts = down ? 0.75 : hot ? 1.9 : 1; scale += (ts - scale) * 0.18; spin += ((hot ? Math.PI / 4 : 0) - spin) * 0.14; rot = spin;
-      dg.clearRect(0, 0, d.width, d.height); dg.fillStyle = "#fff"; star(dg, d.width / 2, d.height / 2, 7 * scale * dpr, rot);
+      const ts = down ? 0.7 : hot ? 1.25 : 1; scale += (ts - scale) * 0.18; spin += ((hot ? 0.35 : 0) - spin) * 0.14; rot = spin;
+      dg.clearRect(0, 0, d.width, d.height); dg.strokeStyle = "#fff"; dg.lineCap = "round"; dg.lineWidth = 1.5 * dpr;
+      FAN.forEach((a, i) => ln(dg, d.width / 2, d.height / 2, a + rot, 3.2 * scale * dpr, (3.2 + FLEN[i] * (hot ? 1.5 : 1)) * scale * dpr));
+      dg.beginPath(); dg.arc(d.width / 2, d.height / 2, 1.1 * dpr, 0, Math.PI * 2); dg.fillStyle = "#fff"; dg.fill();
       d.style.transform = `translate3d(${cx - DOT / 2}px,${cy - DOT / 2}px,0)`;
       // trail glints
-      sg.clearRect(0, 0, s.width, s.height); sg.fillStyle = "#fff";
+      sg.clearRect(0, 0, s.width, s.height); sg.strokeStyle = "#fff"; sg.lineCap = "round"; sg.lineWidth = 1.3 * dpr;
       for (let i = gs.length - 1; i >= 0; i--) {
         const p = gs[i]; p.life += dt; if (p.life >= p.max) { gs.splice(i, 1); continue; }
         const t = p.life / p.max; p.x += p.vx * k; p.y += p.vy * k; p.rot += p.vr * k;
-        sg.globalAlpha = Math.pow(1 - t, 1.2); star(sg, p.x * dpr, p.y * dpr, p.r * (1 - t * 0.6) * dpr, p.rot);
+        sg.globalAlpha = Math.pow(1 - t, 1.1);
+        for (let q = -1; q <= 1; q++) { const a = p.rot + q * 0.55, o = 2 + t * 7, L = p.r * (q === 0 ? 1 : 0.65) * (1 - t * 0.5); ln(sg, p.x * dpr, p.y * dpr, a, o * dpr, (o + L) * dpr); }
       }
       sg.globalAlpha = 1;
       // click rays
@@ -68,7 +66,7 @@ export function Cursor() {
         p.x += p.vx * k; p.y += p.vy * k; p.vx *= Math.pow(0.9, k); p.vy *= Math.pow(0.9, k);
       }
       g.globalAlpha = 1;
-      const moving = Math.abs(x - cx) + Math.abs(y - cy) > 0.2 || Math.abs(ts - scale) > 0.01 || Math.abs((hot ? Math.PI / 4 : 0) - spin) > 0.01;
+      const moving = Math.abs(x - cx) + Math.abs(y - cy) > 0.2 || Math.abs(ts - scale) > 0.01 || Math.abs((hot ? 0.35 : 0) - spin) > 0.01;
       raf = gs.length || ps.length || moving ? requestAnimationFrame(frame) : 0;
     };
     const strike = (px: number, py: number) => {
@@ -79,16 +77,16 @@ export function Cursor() {
       }
       run();
     };
-    const drop = (px: number, py: number) => {
+    const drop = (px: number, py: number, dx: number, dy: number) => {
       if (reduce || gs.length > 22) return;
-      gs.push({ x: px + (Math.random() - 0.5) * 6, y: py + (Math.random() - 0.5) * 6, vx: (Math.random() - 0.5) * 0.5, vy: 0.1 + Math.random() * 0.25, r: 3 + Math.random() * 5, rot: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 0.04, life: 0, max: 650 + Math.random() * 450 });
+      gs.push({ x: px + (Math.random() - 0.5) * 6, y: py + (Math.random() - 0.5) * 6, vx: (Math.random() - 0.5) * 0.5, vy: 0.1 + Math.random() * 0.25, r: 4 + Math.random() * 6, rot: Math.atan2(-dy, -dx) + (Math.random() - 0.5) * 1.6, vr: 0, life: 0, max: 650 + Math.random() * 450 });
     };
     const show = (v: boolean) => { if (v !== shown) { shown = v; root.classList.toggle("cur-on", v); } };
     const move = (e: PointerEvent) => {
       x = e.clientX; y = e.clientY;
       if (!shown) { cx = x; cy = y; show(true); lx = x; ly = y; }
-      acc += Math.hypot(x - lx, y - ly); lx = x; ly = y;
-      if (acc > 46) { acc = 0; drop(x, y); }
+      const mx = x - lx, my = y - ly; acc += Math.hypot(mx, my); lx = x; ly = y;
+      if (acc > 46) { acc = 0; drop(x, y, mx || 1, my); }
       const t = e.target as Element | null;
       hot = !!t?.closest("a,button,summary,label,[role=button],[data-cursor]");
       root.classList.toggle("cur-text", !!t?.closest("input,textarea,select,[contenteditable=true]"));
