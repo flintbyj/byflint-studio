@@ -242,7 +242,7 @@ export function Services() {
 
 /* ---------- The people behind the work ---------- */
 const people = [
-  { ini: "JG", name: "Jatin Gupta", bio: "Starts where the product gets used: with Indofast’s station operators, in VLCC’s stores, beside its sales team. The work runs from operator apps to Fellafeeds’ dashboard and Zeroharm’s Body Balance Trio page." },
+  { ini: "JG", name: "Jatin Gupta", bio: "Five years designing products, 25+ shipped across 6 industries, from battery swapping to health and beauty retail and consumer health. Rebuilt four Indofast Energy panels into one design system and cut their approvals to two steps. Founded Flint Studio in Delhi in 2025." },
   { ini: "TG", name: "Taarush Goyal", bio: "Three years at Onething Design, on Royal Enfield, TVS, Ashok Leyland, Jio Institute and Apnamart’s point-of-sale system. Studied psychology." },
 ];
 
