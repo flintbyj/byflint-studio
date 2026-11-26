@@ -81,6 +81,9 @@ export function Problems() {
         const d = Math.min(3, acc), c = cardsEl[i];
         c.style.transform = rm.matches ? "" : `scale(${1 - 0.04 * d})`;
         c.style.setProperty("--recede", Math.min(1, d).toFixed(3));
+        // when the stack starts to leave, the pile behind the last card clears so only the last card travels out with the heading
+        const pushed = Math.max(0, tops[items.length - 1] - rects[items.length - 1].top);
+        c.style.opacity = i === items.length - 1 ? "" : String(Math.max(0, 1 - pushed / 36));
       }
     };
     const kick = () => { if (visible && !raf) raf = requestAnimationFrame(frame); };
