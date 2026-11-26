@@ -28,6 +28,15 @@ export function Cursor() {
       if (!sraf) { last = performance.now(); sraf = requestAnimationFrame(frame); }
     };
     let last = 0;
+    // one strike on click, like a flint wheel: a short radial burst of rays and glints
+    const strike = (px: number, py: number) => {
+      if (reduce || document.documentElement.classList.contains("cur-text")) return;
+      for (let i = 0; i < 18 && ps.length < 160; i++) {
+        const a = (i / 18) * Math.PI * 2 + (Math.random() - 0.5) * 0.5, v = 2.2 + Math.random() * 5.2, r = Math.random();
+        ps.push({ x: px, y: py, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, max: r < 0.2 ? 700 + Math.random() * 400 : 320 + Math.random() * 380, len: r < 0.2 ? 7 + Math.random() * 8 : 12 + Math.random() * 22, kind: r < 0.2 ? 1 : r < 0.4 ? 2 : 0, rot: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 0.05 });
+      }
+      if (!sraf) { last = performance.now(); sraf = requestAnimationFrame(frame); }
+    };
     const frame = (now: number) => {
       const dt = Math.min(48, now - last); last = now;
       g.clearRect(0, 0, c.width, c.height);
@@ -77,7 +86,6 @@ export function Cursor() {
     const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
     const show = (v: boolean) => { if (v !== shown) { shown = v; root.classList.toggle("cur-on", v); } };
     const move = (e: PointerEvent) => {
-      if (lx >= 0) spark(e.clientX, e.clientY, e.clientX - lx, e.clientY - ly);
       lx = e.clientX; ly = e.clientY;
       x = e.clientX; y = e.clientY; if (!shown) { rx = x; ry = y; show(true); }
       const t = e.target as Element | null;
@@ -89,7 +97,7 @@ export function Cursor() {
       root.classList.toggle("cur-text", isText);
       kick();
     };
-    const dn = () => { down = true; r.classList.add("is-down"); kick(); };
+    const dn = (e: PointerEvent) => { strike(e.clientX, e.clientY); down = true; r.classList.add("is-down"); kick(); };
     const up = () => { down = false; r.classList.remove("is-down"); kick(); };
     const out = (e: MouseEvent) => { if (!e.relatedTarget) show(false); };
     window.addEventListener("pointermove", move, { passive: true }); window.addEventListener("resize", fit);
