@@ -25,26 +25,24 @@ const dark = Array.from({ length: 16 * COLS }, (_, i) => {
   const cls = lit.has(`${r}-${c}`) ? "p on" : rand() < 0.06 ? "p m" : "p";
   return { cls, d: ((Math.abs(c - 30) + r) * 0.035).toFixed(2) + "s" };
 });
-const light = Array.from({ length: 9 * COLS }, (_, i) => {
-  const r = Math.floor(i / COLS), keep = Math.max(0, 0.8 - r * 0.1), u = rand();
-  return u < keep * 0.55 ? "q" : u < keep ? "q t" : "q x";
-});
-
 export function Footer() {
   return (
-    <footer>
-      <div className="gd" aria-hidden="true">{dark.map((p, i) => <i key={i} className={p.cls} style={{ ["--d" as string]: p.d }} />)}</div>
-      <div className="gl" aria-hidden="true">{light.map((c, i) => <i key={i} className={c} />)}</div>
-      <Row style={{ borderTop: "1px solid var(--line)" }}>
+    <footer className="ft">
+      <Row>
         <div className="fin rv">
-          <div>
+          <div className="fc">
             <p className="h2">For teams who operate in possibilities, <span>not bandwidth.</span></p>
-            <p style={{ marginTop: 14, fontSize: 17, color: "#5A5A55" }}>Bring the goal, not a brief. We&apos;ll tell you what we&apos;d ship first.</p>
+            <p className="fsub">Bring the goal, not a brief. We&apos;ll tell you what we&apos;d ship first.</p>
             <form className="box" aria-label="Book a call"><label htmlFor="fm" style={{ position: "absolute", left: -9999 }}>Work email</label><input id="fm" type="email" placeholder="you@company.com" /><a className="btn cit" href="https://cal.com/byflint">Book a call <Arrow /></a></form>
           </div>
-          <div className="lk"><p>Studio</p><a href="#work">Work</a><a href="#services">Services</a><a href="#about">About</a><a href="#faq">FAQ</a></div>
-          <div className="lk"><p>Contact</p><a href="mailto:hello@byflint.studio">hello@byflint.studio</a><a href="tel:+917303415009">+91 73034 15009</a><a href="#">LinkedIn</a><a href="#">Instagram</a></div>
+          <div className="lk fc"><p>Studio</p><a href="#work">Work</a><a href="#services">Services</a><a href="#about">About</a><a href="#faq">FAQ</a></div>
+          <div className="lk fc"><p>Contact</p><a href="mailto:hello@byflint.studio">hello@byflint.studio</a><a href="tel:+917303415009">+91 73034 15009</a><a href="#">LinkedIn</a><a href="#">Instagram</a></div>
         </div>
+      </Row>
+      <Row>
+        <div className="gd" aria-hidden="true">{dark.map((p, i) => <i key={i} className={p.cls} style={{ ["--d" as string]: p.d }} />)}</div>
+      </Row>
+      <Row>
         <div className="bot"><span style={{ display: "flex", alignItems: "center", gap: 10 }}><Mark width={16} height={20} /> © 2026 Flint Studio · Delhi, India</span><span>Available for Q1 2027</span></div>
       </Row>
     </footer>
