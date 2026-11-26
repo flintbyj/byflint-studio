@@ -7,7 +7,7 @@ export function Logos() {
       <span className="bar v" style={{ left: -3, top: 60 }} />
       <div className="logos">
         <div className="rv" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-          <h2 className="h2" style={{ fontSize: "clamp(24px, 2.5vw, 32px)" }}>Join 25+ brands&apos;<br /><span>success stories</span></h2>
+          <h2 className="h2" style={{ fontSize: "clamp(24px, 2.5vw, 32px)" }}>Join 25+ brands<br /><span>and their success stories</span></h2>
           <a className="btn sm" href="#work" style={{ alignSelf: "flex-start" }}>View case studies <Arrow /></a>
         </div>
         <div className="tiles rv">
