@@ -175,7 +175,7 @@ a{color:#202329}a:hover{color:#000}
 .sx-on:not(.sx-done) .sx-page{--line:transparent}
 .sx-on:not(.sx-done) .hero .bar{visibility:hidden}
 .sx-fx{display:none}
-.sx-on .sx-fx{display:block;position:absolute;left:0;top:0;width:100%;height:100vh;overflow:hidden;pointer-events:none;z-index:40;opacity:var(--sxo,1)}
+.sx-on .sx-fx{display:block;position:absolute;left:0;top:0;width:100%;height:100vh;overflow:hidden;pointer-events:none;z-index:40}
 .sx-done .sx-fx{visibility:hidden}
 .sx-ln{position:absolute;left:0;top:0;background:var(--line);will-change:transform}
 .sx-h{width:100%;height:1px}

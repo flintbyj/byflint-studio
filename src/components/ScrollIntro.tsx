@@ -68,6 +68,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
       const a = ease(seg(p, 0, 0.45)), c = ease(seg(p, 0.5, 0.9));
       const first = p < 0.475;
       const r = first ? lr(s1, s2, a) : lr(s2, s3, c);
+      b.style.visibility = first ? "" : "hidden"; // past the shrink the box is page-coloured; hiding it lets the hero button and cards show as they build in
       b.style.transform = `translate(${r.x}px,${r.y}px)`;
       b.style.width = r.w + "px";
       b.style.height = r.h + "px";
@@ -168,7 +169,6 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         el.style.transform = done ? "" : `translateY(${(1 - e) * 96}px)`;
         el.style.clipPath = done ? "" : `inset(0 0 ${(1 - e) * 100}% 0)`;
       }));
-      st.style.setProperty("--sxo", String(1 - seg(p, 0.93, 1)));
       w.classList.toggle("sx-done", p >= 0.999);
     };
 
