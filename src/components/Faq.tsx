@@ -25,7 +25,7 @@ export function Faq() {
             ))}
           </div>
         </div>
-        <div className="chat rv" aria-live="polite">
+        <div className="chat rv whole" aria-live="polite">
           <div className="top"><span className="av"><Mark width={16} height={20} /></span><span><b style={{ color: "var(--ink)" }}>Flint Studio</b> <span className="live" /> usually replies within 24 hours</span></div>
           <p className="me" key={"q" + sel}>{cur.q}</p>
           {typing ? <div className="typing"><i /><i /><i /></div> : <p className="them" key={"a" + sel}>{cur.a}</p>}

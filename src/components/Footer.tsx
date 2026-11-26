@@ -36,7 +36,7 @@ export function Footer() {
       <div className="gd" aria-hidden="true">{dark.map((p, i) => <i key={i} className={p.cls} style={{ ["--d" as string]: p.d }} />)}</div>
       <div className="gl" aria-hidden="true">{light.map((c, i) => <i key={i} className={c} />)}</div>
       <Row style={{ borderTop: "1px solid var(--line)" }}>
-        <div className="fin">
+        <div className="fin rv">
           <div>
             <p className="h2">For teams who operate in possibilities, <span>not bandwidth.</span></p>
             <p style={{ marginTop: 14, fontSize: 17, color: "#5A5A55" }}>Bring the goal, not a brief. We&apos;ll tell you what we&apos;d ship first.</p>

@@ -33,6 +33,9 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
     w.classList.add("sx-on");
     const q = (s: string) => st.querySelector(s) as HTMLElement;
     const lnT = q(".sx-lt"), lnB = q(".sx-lb"), lnL = q(".sx-ll"), lnR = q(".sx-lr");
+    const navA = Array.from(st.querySelectorAll<HTMLElement>(".nav .l a, .nav > a:last-child"));
+    const ctaEl = st.querySelector<HTMLElement>(".hero .cta");
+    const cardEls = Array.from(st.querySelectorAll<HTMLElement>(".work .card"));
     const bH1 = q(".sx-h1"), bH2 = q(".sx-h2"), bV1 = q(".sx-v1"), bV2 = q(".sx-v2");
     let cur = 0, raf = 0, ld = 1, lraf = 0;
     const root = document.documentElement;
@@ -108,30 +111,29 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
 
       // builder bars, one axis each. H1 sits on the bottom line, H2 on the top line, V1 on the left line, V2 on the right line.
       const rx = r.x + r.w, by = r.y + r.h;
-      const h1Rest = mob ? r.x + 70 : X(227), h2Rest = mob ? rx - 116 : X(1099);
       const v1Rest = mob ? s2.y - 60 : Y(58), v2Rest = mob ? s2.y + s2.h + 14 : Y(728);
       const OFF = 60;
-      let h1x = h1Rest, h2x = h2Rest, v1y = -OFF, v2y = vh + 10;
+      // H bars only exist during the opening loader (they draw the top and bottom lines and leave); V bars come in on scroll 1.
+      let h1x = -OFF, h2x = vw + 10, v1y = -OFF, v2y = vh + 10;
       if (first) {
-        const ex = ease(seg(a, 0, 0.6)), en = ease(seg(a, 0.3, 1));
-        h1x = lerp(h1Rest, -OFF, ex); h2x = lerp(h2Rest, vw + 10, ex);
+        const en = ease(seg(a, 0.3, 1));
         v1y = lerp(-OFF, v1Rest, en); v2y = lerp(vh + 10, v2Rest, en);
       } else {
-        h1x = -OFF; h2x = vw + 10;
         v1y = lerp(v1Rest, tL.y, c); v2y = lerp(v2Rest, tR.y, c);
       }
 
-      // opening loader (ld 0 -> 1): V1 runs down the left line and V2 up the right line, drawing them; H1 runs right to left
-      // along the bottom line and H2 left to right along the top line, drawing those. Then colour wipes in, then the text.
+      // opening loader (ld 0 -> 1): each bar draws its own line, end to end, and leaves the screen. V1 runs down the left line,
+      // V2 up the right line, H1 right to left along the bottom line, H2 left to right along the top line. Lines show only
+      // where a bar has been. Then the colour wipes into the box, then the text.
       if (ld < 1) {
-        const f = ease(seg(ld, 0, 0.6)), settle = ease(seg(ld, 0.5, 0.85));
+        const f = ease(seg(ld, 0, 0.62));
         v1y = lerp(-OFF, vh + 10, f); v2y = lerp(vh + 10, -OFF, f);
-        h1x = lerp(vw + 10, h1Rest, f); h2x = lerp(-OFF, h2Rest, f);
-        lnL.style.clipPath = `inset(0 0 ${clampN((1 - Math.max((v1y + 46) / vh, settle)) * 100)}% 0)`;
-        lnR.style.clipPath = `inset(${clampN(Math.min(v2y / vh, 1 - settle) * 100)}% 0 0 0)`;
-        lnB.style.clipPath = `inset(0 0 0 ${clampN(((h1x * (1 - settle)) / vw) * 100)}%)`;
-        lnT.style.clipPath = `inset(0 ${clampN(100 - ((lerp(h2x + 46, vw, settle)) / vw) * 100)}% 0 0)`;
-        const rv = ease(seg(ld, 0.55, 0.85)), tf = ease(seg(ld, 0.8, 1));
+        h1x = lerp(vw + 10, -OFF, f); h2x = lerp(-OFF, vw + 10, f);
+        lnL.style.clipPath = `inset(0 0 ${clampN((1 - (v1y + 46) / vh) * 100)}% 0)`;
+        lnR.style.clipPath = `inset(${clampN((v2y / vh) * 100)}% 0 0 0)`;
+        lnB.style.clipPath = `inset(0 0 0 ${clampN((h1x / vw) * 100)}%)`;
+        lnT.style.clipPath = `inset(0 ${clampN(100 - ((h2x + 46) / vw) * 100)}% 0 0)`;
+        const rv = ease(seg(ld, 0.58, 0.88)), tf = ease(seg(ld, 0.82, 1));
         b.style.clipPath = `inset(${clampN((1 - rv) * 100)}% 0 0 0)`;
         tx.style.opacity = String(tf);
         lg.style.opacity = String(tf);
@@ -145,7 +147,27 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
       bV1.style.transform = `translate(${r.x - 3}px,${v1y}px)`;
       bV2.style.transform = `translate(${rx - 3}px,${v2y}px)`;
 
-      st.style.setProperty("--sxr", String(seg(p, 0.86, 0.98)));
+      // the rest of the first screen builds in while the box lands: nav links drop in, the button and the cards
+      // rise on staggered starts (slide + wipe, not a page fade). Cleared at the end so the real styles take over.
+      const stag = (el: HTMLElement | null | undefined, i: number, fn: (e: number) => void) => {
+        if (!el) return;
+        const st0 = 0.8 + i * 0.03;
+        fn(ease(seg(p, st0, Math.min(1, st0 + 0.17))));
+      };
+      const done = p >= 0.999;
+      navA.forEach((el, i) => stag(el, i, (e) => {
+        el.style.opacity = done ? "" : String(Math.min(1, e * 2));
+        el.style.transform = done ? "" : `translateY(${(1 - e) * -22}px)`;
+      }));
+      stag(ctaEl, 2, (e) => {
+        ctaEl!.style.opacity = done ? "" : String(Math.min(1, e * 2));
+        ctaEl!.style.transform = done ? "" : `translateY(${(1 - e) * 48}px)`;
+      });
+      cardEls.forEach((el, i) => stag(el, 3 + Math.min(i, 3), (e) => {
+        el.style.opacity = done ? "" : String(Math.min(1, e * 2.5));
+        el.style.transform = done ? "" : `translateY(${(1 - e) * 96}px)`;
+        el.style.clipPath = done ? "" : `inset(0 0 ${(1 - e) * 100}% 0)`;
+      }));
       st.style.setProperty("--sxo", String(1 - seg(p, 0.93, 1)));
       w.classList.toggle("sx-done", p >= 0.999);
     };

@@ -4,10 +4,12 @@ import { ScrollIntro } from "@/components/ScrollIntro";
 import { Logos, Marquee, Services, Problems, Testimonial } from "@/components/Sections";
 import { Faq } from "@/components/Faq";
 import { Footer } from "@/components/Footer";
+import { Reveal } from "@/components/Reveal";
 
 export default function Home() {
   return (
     <div className="v3">
+      <Reveal />
       <ScrollIntro>
       <header className="nav">
         <div className="l"><a href="#about">about flint</a><a href="#work">work</a></div>

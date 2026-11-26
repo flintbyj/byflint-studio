@@ -88,7 +88,7 @@ export function Testimonial({ which }: { which: keyof typeof testimonials }) {
         <div className="tqin">
           <div className="tql">
             <span className="tbar" aria-hidden="true" />
-            <blockquote className="rv">{t.quote}</blockquote>
+            <blockquote className="rv whole">{t.quote}</blockquote>
             <p className="tw"><b>{t.name}</b>{t.role}</p>
           </div>
           <div className="tqr rv">
