@@ -55,6 +55,11 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
     const cardEls = Array.from(st.querySelectorAll<HTMLElement>(".work .card"));
     const bV1 = q(".sx-v1"), bV2 = q(".sx-v2");
     let cur = 0, raf = 0, ld = 1, lraf = 0;
+    // lines are time-based, not scrubbed: scrolling past a mark makes a bar run its whole line by itself, so nothing hangs mid-screen
+    const dS: number[] = [], eS: number[] = [];
+    let lt = performance.now(), anim = false;
+    const LDUR = 1.1;
+    const toward = (v: number, want: number, dt: number) => (v < want ? Math.min(want, v + dt) : Math.max(want, v - dt));
     const root = document.documentElement;
     const clampN = (v: number) => Math.min(100, Math.max(0, v));
 
@@ -138,7 +143,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
 
       const rx = r.x + r.w, by = r.y + r.h;
       const v1Rest = mob ? s2.y - 60 : Y(58), v2Rest = mob ? s2.y + s2.h + 14 : Y(728);
-      const OFF = 130;
+      const OFF = 60;
       // V1 / V2: come in along the left and right box edges on scroll 1 and land on the hero's own bars
       let v1y = -OFF, v2y = vh + 10;
       if (first) {
@@ -177,13 +182,18 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
           { h: false, c: s2.x + s2.w + S(195), f: vh, t: c3, w: [1.6, 1.95], rv: [2.1, 2.35] },
         );
       }
+      const nowT = performance.now(), dts = Math.min(0.064, (nowT - lt) / 1000); lt = nowT; anim = false;
       segs.forEach((g, i) => {
         const le = sgL[i], be = sgB[i];
         if (!le || !be) return;
         // every line starts at a fixed place (the screen edge or the box corner), a bar runs it to the far end and carries on out;
         // taking a line back works the same way: the bar runs the same direction again and eats the line from its start
-        let u = ease(seg(mt, g.w[0], g.w[1]));
-        const er = g.rv ? ease(seg(mt, g.rv[0], g.rv[1])) : 0;
+        const wantD = mt >= g.w[0] ? 1 : 0, wantE = g.rv && mt >= g.rv[0] ? 1 : 0;
+        dS[i] = toward(dS[i] ?? 0, wantD, dts / LDUR);
+        eS[i] = toward(eS[i] ?? 0, wantD ? wantE : 0, dts / LDUR);
+        if (dS[i] !== wantD || eS[i] !== (wantD ? wantE : 0)) anim = true;
+        let u = ease(dS[i]);
+        const er = ease(eS[i]);
         const dir = Math.sign(g.t - g.f) || 1, len = Math.abs(g.t - g.f);
         const at = (q: number) => g.f + dir * (len + OFF) * q;
         const tip = er > 0 ? at(er) : at(u);
@@ -197,13 +207,12 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
           le.style.width = (g.h ? vl : 1) + "px"; le.style.height = (g.h ? 1 : vl) + "px";
           le.style.transform = g.h ? `translate(${Math.min(startV, ve)}px,${g.c}px)` : `translate(${g.c}px,${Math.min(startV, ve)}px)`;
         }
-        const BL = 120, tail = tip - dir * BL, shown = u > 0.0005 && dir * (tail - g.t) < 0;
+        const BL = 44, tail = tip - dir * BL, shown = u > 0.0005 && dir * (tail - g.t) < 0;
         be.style.display = shown ? "block" : "none";
         if (shown) {
-          be.style.width = (g.h ? BL : 3) + "px"; be.style.height = (g.h ? 3 : BL) + "px";
-          be.style.background = `linear-gradient(${g.h ? (dir > 0 ? "90deg" : "270deg") : (dir > 0 ? "180deg" : "0deg")}, rgba(83,98,122,0), #53627A 70%, #202329)`;
+          be.style.width = (g.h ? BL : 4) + "px"; be.style.height = (g.h ? 4 : BL) + "px";
           const lo = Math.min(tip, tail);
-          be.style.transform = g.h ? `translate(${lo}px,${g.c - 1}px)` : `translate(${g.c - 1}px,${lo}px)`;
+          be.style.transform = g.h ? `translate(${lo}px,${g.c - 1.5}px)` : `translate(${g.c - 1.5}px,${lo}px)`;
         }
       });
 
@@ -255,7 +264,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
       cur += (t - cur) * 0.12;
       if (Math.abs(t - cur) < 0.0008) cur = t;
       draw(cur);
-      raf = cur === t ? 0 : requestAnimationFrame(tick);
+      raf = cur === t && !anim ? 0 : requestAnimationFrame(tick);
     };
     const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
     cur = target();
