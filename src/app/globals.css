@@ -320,3 +320,12 @@ a{color:#202329}a:hover{color:#000}
 }
 @media (min-width:1024px){.cg-in{padding:80px 48px}.cg-pill{width:468px}}
 @media (prefers-reduced-motion:reduce){.cg-done{clip-path:inset(0 0 0 0 round 999px)!important;background:var(--cit)!important}.cg-done>span{transform:none!important}}
+/* team */
+.tm-in{padding:56px 20px}
+.tm-h{margin:0;font-size:clamp(28px,3.2vw,40px);line-height:1.15;font-weight:600;letter-spacing:-.02em}
+.tm-in .tm-s{margin:16px 0 0;max-width:34em;font-size:16px;line-height:1.5;color:var(--t2)}
+.tm-g{list-style:none;margin:40px 0 0;padding:0;display:grid;grid-template-columns:1fr;gap:32px}
+.tm-ph{aspect-ratio:4/3;background:var(--muted);display:flex;align-items:center;justify-content:center;font-size:clamp(28px,3vw,40px);font-weight:600;color:var(--t2)}
+.tm-c h3{margin:20px 0 0;font-size:22px;line-height:1.25;font-weight:600;letter-spacing:-.01em}
+.tm-c p{margin:8px 0 0;max-width:36em;font-size:16px;line-height:1.55;color:var(--t2);text-wrap:pretty}
+@media (min-width:1024px){.tm-in{padding:80px 48px}.tm-g{grid-template-columns:1fr 1fr;gap:28px}}

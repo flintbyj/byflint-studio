@@ -239,3 +239,29 @@ export function Services() {
     </Row>
   );
 }
+
+/* ---------- The people behind the work ---------- */
+const people = [
+  { ini: "JG", name: "Jatin Gupta", bio: "Starts where the product gets used: with Indofast’s station operators, in VLCC’s stores, beside its sales team. The work runs from operator apps to Fellafeeds’ dashboard and Zeroharm’s Body Balance Trio page." },
+  { ini: "TG", name: "Taarush Goyal", bio: "Three years at Onething Design, on Royal Enfield, TVS, Ashok Leyland, Jio Institute and Apnamart’s point-of-sale system. Studied psychology." },
+];
+
+export function Team() {
+  return (
+    <Row className="tm">
+      <section className="tm-in" aria-labelledby="tm-h">
+        <h2 id="tm-h" className="tm-h rv">The people behind the work</h2>
+        <p className="tm-s rv">Two designers. Either can take any request, and each reviews the other’s work.</p>
+        <ul className="tm-g">
+          {people.map((p) => (
+            <li key={p.ini} className="tm-c rv">
+              <div className="tm-ph" aria-hidden="true">{p.ini}</div>
+              <h3>{p.name}</h3>
+              <p>{p.bio}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </Row>
+  );
+}
