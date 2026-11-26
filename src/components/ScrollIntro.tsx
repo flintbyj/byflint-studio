@@ -180,6 +180,13 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
           { h: false, c: s2.x - S(179), f: 0, t: c1, w: [1.6, 1.95], rv: [2.0, 2.25] },
           { h: true, c: c3, f: vw, t: rx, w: [1.45, 1.8], rv: [2.05, 2.3] },
           { h: false, c: s2.x + s2.w + S(195), f: vh, t: c3, w: [1.6, 1.95], rv: [2.1, 2.35] },
+          // extra cell lines, same family, so the first scroll fills out like frame 2
+          { h: true, c: s2.y + S(52), f: vw, t: rx, w: [1.1, 1.45], rv: [2.0, 2.25] },
+          { h: true, c: s2.y + S(430), f: 0, t: r.x, w: [1.2, 1.55], rv: [2.05, 2.3] },
+          { h: false, c: s2.x - S(330), f: vh, t: c2, w: [1.3, 1.65], rv: [2.1, 2.35] },
+          { h: false, c: s2.x + s2.w + S(360), f: 0, t: c1, w: [1.25, 1.6], rv: [2.0, 2.25] },
+          { h: true, c: s2.y + S(480), f: vw, t: rx, w: [1.5, 1.85], rv: [2.1, 2.35] },
+          { h: false, c: s2.x + S(130), f: vh, t: s2.y + s2.h, w: [1.4, 1.75], rv: [2.15, 2.4] },
         );
       }
       const nowT = performance.now(), dts = Math.min(0.064, (nowT - lt) / 1000); lt = nowT; anim = false;
@@ -291,10 +298,10 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
       <div className="sx-stage" ref={stage}>
         <div className="sx-page">{children}</div>
         <div className="sx-fx" aria-hidden="true">
-          {Array.from({ length: 13 }, (_, i) => <span key={"l" + i} className="sx-sg" />)}
+          {Array.from({ length: 19 }, (_, i) => <span key={"l" + i} className="sx-sg" />)}
           <div className="sx-box" ref={box}>
           </div>
-          {Array.from({ length: 13 }, (_, i) => <span key={"b" + i} className="sx-sb" />)}
+          {Array.from({ length: 19 }, (_, i) => <span key={"b" + i} className="sx-sb" />)}
           <span className="sx-bar sx-bv sx-v1" /><span className="sx-bar sx-bv sx-v2" />
         </div>
         <h1 className="sx-txt" ref={txtR} aria-hidden="true">Design Bandwidth<br />for startups and scale-ups.<br /><span>Shipped in code.</span></h1>
