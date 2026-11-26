@@ -55,6 +55,7 @@ export function Problems() {
     // every card leaves at the same scroll position and the heading goes with them, so the stack scrolls out as one piece
     const setTop = () => {
       ol.style.setProperty("--stack-top", h.offsetHeight + "px");
+      ol.parentElement!.style.setProperty("--stack-top", h.offsetHeight + "px");
       const peek = parseFloat(getComputedStyle(ol).getPropertyValue("--stack-peek")) || 0;
       const K = Math.max(...items.map((li, n) => n * peek + li.offsetHeight));
       items.forEach((li, n) => { li.style.marginBottom = K - n * peek - li.offsetHeight + "px"; });
