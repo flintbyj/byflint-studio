@@ -176,11 +176,11 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         // re-fit to the smaller box (frame 1 -> frame 2 only changes cell sizes); they are taken back on the way to the hero.
         const m = (v1: number, v2: number) => lerp(v1, v2, a);
         segs.push(
-          { h: false, c: m(X(148), X(200)), f: 0, t: Y(285), w: [0.15, 0.7], rv: [2.0, 2.3] },
-          { h: true, c: Y(285), f: 0, t: r.x, w: [0.2, 0.75], rv: [2.02, 2.32] },
-          { h: true, c: m(Y(517), Y(472)), f: 0, t: r.x, w: [0.25, 0.8], rv: [2.04, 2.34] },
-          { h: true, c: Y(540), f: vw, t: rx, w: [0.3, 0.85], rv: [2.06, 2.36] },
-          { h: false, c: m(X(1123), X(1093)), f: vh, t: Y(540), w: [0.35, 0.9], rv: [2.08, 2.38] },
+          { h: false, c: m(X(148), X(200)), f: 0, t: Y(285), w: [0.15, 0.7], rv: [2.5, 2.8] },
+          { h: true, c: Y(285), f: 0, t: r.x, w: [0.2, 0.75], rv: [2.52, 2.82] },
+          { h: true, c: m(Y(517), Y(472)), f: 0, t: r.x, w: [0.25, 0.8], rv: [2.54, 2.84] },
+          { h: true, c: Y(540), f: vw, t: rx, w: [0.3, 0.85], rv: [2.56, 2.86] },
+          { h: false, c: m(X(1123), X(1093)), f: vh, t: Y(540), w: [0.35, 0.9], rv: [2.58, 2.88] },
         );
       }
       const nowT = performance.now(), dts = Math.min(0.064, (nowT - lt) / 1000); lt = nowT; anim = false;
