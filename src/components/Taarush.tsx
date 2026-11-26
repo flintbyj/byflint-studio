@@ -51,10 +51,16 @@ export function Problems() {
     armSound();
     const h = head.current, ol = list.current;
     if (!h || !ol) return;
-    const setTop = () => ol.style.setProperty("--stack-top", h.offsetHeight + "px");
-    setTop();
-    const ro = new ResizeObserver(setTop); ro.observe(h);
     const items = Array.from(ol.children) as HTMLElement[];
+    // the heading holds only until the last card starts to leave, so heading and cards scroll out together
+    const setTop = () => {
+      ol.style.setProperty("--stack-top", h.offsetHeight + "px");
+      const peek = parseFloat(getComputedStyle(ol).getPropertyValue("--stack-peek")) || 0;
+      const last = items[items.length - 1];
+      ol.parentElement!.style.setProperty("--lp-b", last.offsetHeight + peek * (items.length - 1) + "px");
+    };
+    setTop();
+    const ro = new ResizeObserver(setTop); ro.observe(h); ro.observe(items[items.length - 1]);
     const cardsEl = items.map((li) => li.firstElementChild as HTMLElement);
     const rm = window.matchMedia("(prefers-reduced-motion: reduce)");
     let raf = 0, visible = false, last = -1;
@@ -87,9 +93,9 @@ export function Problems() {
   return (
     <Row className="lp">
       <section id="problems" aria-labelledby="lp-h" className="lp-in">
-        <div className="lp-head" ref={head}>
+        <div className="lp-hw"><div className="lp-head" ref={head}>
           <h2 id="lp-h" className="lp-title"><span>24 things are running in parallel,</span> <b>and your launch date can’t move.</b></h2>
-        </div>
+        </div></div>
         <ol className="lp-stack" ref={list}>
           {cards.map((c, n) => (
             <li className="lp-item" style={{ ["--i" as string]: n }} key={c.i}>
