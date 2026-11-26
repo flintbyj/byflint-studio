@@ -168,22 +168,22 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         { h: true, c: by, f: rx, t: 0, w: [0.07, 0.67] },
         // growth into the full page lines while the box becomes the hero
         { h: false, c: r.x - 1, f: by, t: vh, w: [2.3, 2.8], sc: true },
-        { h: true, c: r.y - 1, f: r.x, t: 0, w: [2.3, 2.8], sc: true },
-        { h: false, c: rx, f: r.y, t: up, w: [2.35, 2.85], sc: true },
         { h: true, c: by, f: rx, t: vw, w: [2.35, 2.85], sc: true },
       ];
       if (!mob) {
         // one grid for the whole intro. It is drawn once in the opening view (a bar runs each line in) and never taken back:
         // every scroll only re-fits the same lines to the new cell sizes (frame 1 -> frame 2 -> the hero).
         const m = (v1: number, v2: number, v3: number) => (first ? lerp(v1, v2, a) : lerp(v2, v3, c));
-        // in the hero the side cells are only slivers: the vertical cell lines slide out of the screen and the horizontal ones
-        // glide onto the page's own lines (nav bottom, hero bottom), so the finished hero has no extra lines left over
+        // the side cells are the same cells in every frame (from the design): each frame just resizes them. In the hero the left cell
+        // becomes the left column (its right edge lands on the hero's left line, top and bottom on the header and hero lines) and the
+        // right cell becomes the right column (its right edge is the screen edge), so each line ends up on a line the page already has.
+        const hx = s3.x;
         segs.push(
-          { h: false, c: m(X(148), X(200), -14), f: up, t: m(Y(285), Y(285), hy), w: [0.15, 0.7] },
+          { h: false, c: m(X(148), X(200), hx), f: up, t: m(Y(285), Y(285), hy), w: [0.15, 0.7] },
           { h: true, c: m(Y(285), Y(285), hy), f: 0, t: r.x, w: [0.2, 0.75] },
           { h: true, c: m(Y(517), Y(472), hb), f: 0, t: r.x, w: [0.25, 0.8] },
-          { h: true, c: m(Y(540), Y(540), hb), f: vw, t: rx, w: [0.3, 0.85] },
-          { h: false, c: m(X(1123), X(1093), vw + 14), f: vh, t: m(Y(540), Y(540), hb), w: [0.35, 0.9] },
+          { h: true, c: m(Y(540), Y(540), hy), f: vw, t: rx, w: [0.3, 0.85] },
+          { h: false, c: m(X(1123), X(1093), vw), f: m(vh, vh, hb), t: m(Y(540), Y(540), hy), w: [0.35, 0.9] },
         );
       }
       const nowT = performance.now(), dts = Math.min(0.064, (nowT - lt) / 1000); lt = nowT; anim = false;
