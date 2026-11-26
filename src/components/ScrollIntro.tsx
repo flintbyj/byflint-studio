@@ -135,18 +135,18 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
 
       { // the opening statement, inside the dark box under the mark: it writes in with the headline and wipes away as the box starts to shrink
         const rvl = ld < 1 ? ease(seg(ld, 0.84, 1)) : 1, gone = first ? ease(seg(a, 0, 0.2)) : 1;
-        sm.style.fontSize = (mob ? 20 : 26 * k) + "px";
-        sm.style.width = (r.w - 2 * pad) * (mob ? 1 : 0.78) + "px";
-        sm.style.left = r.x + pad + "px";
-        sm.style.top = r.y + (mob ? 104 : 132 * k) + "px";
+        sm.style.fontSize = tF + "px";
+        sm.style.width = tW + "px";
+        sm.style.left = tX + "px";
+        sm.style.top = tB - sm.getBoundingClientRect().height + "px";
         sm.style.clipPath = gone > 0 ? `inset(${clampN(gone * 100)}% 0 0 0)` : `inset(0 0 ${clampN((1 - rvl) * 100)}% 0)`;
         sm.style.visibility = gone >= 1 ? "hidden" : "";
         // second statement: it writes in as the first one is wiped away, holds in frame 2, then wipes away as the box heads for the hero
         const inB = first ? ease(seg(a, 0.3, 0.8)) : 1 - ease(seg(c, 0, 0.3));
-        sm2.style.fontSize = (mob ? 20 : 26 * k) + "px";
-        sm2.style.width = (r.w - 2 * pad) * (mob ? 1 : 0.78) + "px";
-        sm2.style.left = r.x + pad + "px";
-        sm2.style.top = r.y + (mob ? 104 : 132 * k) + "px";
+        sm2.style.fontSize = tF + "px";
+        sm2.style.width = tW + "px";
+        sm2.style.left = tX + "px";
+        sm2.style.top = tB - sm2.getBoundingClientRect().height + "px";
         sm2.style.color = `rgb(${INK})`;
         sm2.style.clipPath = first ? `inset(0 0 ${clampN((1 - inB) * 100)}% 0)` : `inset(${clampN((1 - inB) * 100)}% 0 0 0)`;
         sm2.style.visibility = inB <= 0 ? "hidden" : "";
