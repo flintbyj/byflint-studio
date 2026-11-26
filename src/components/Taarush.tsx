@@ -52,15 +52,16 @@ export function Problems() {
     const h = head.current, ol = list.current;
     if (!h || !ol) return;
     const items = Array.from(ol.children) as HTMLElement[];
-    // the heading holds only until the last card starts to leave, so heading and cards scroll out together
+    // every card leaves at the same scroll position and the heading goes with them, so the stack scrolls out as one piece
     const setTop = () => {
       ol.style.setProperty("--stack-top", h.offsetHeight + "px");
       const peek = parseFloat(getComputedStyle(ol).getPropertyValue("--stack-peek")) || 0;
-      const last = items[items.length - 1];
-      ol.parentElement!.style.setProperty("--lp-b", last.offsetHeight + peek * (items.length - 1) + "px");
+      const K = Math.max(...items.map((li, n) => n * peek + li.offsetHeight));
+      items.forEach((li, n) => { li.style.marginBottom = K - n * peek - li.offsetHeight + "px"; });
+      ol.parentElement!.style.setProperty("--lp-b", K + "px");
     };
     setTop();
-    const ro = new ResizeObserver(setTop); ro.observe(h); ro.observe(items[items.length - 1]);
+    const ro = new ResizeObserver(setTop); ro.observe(h); items.forEach((li) => ro.observe(li));
     const cardsEl = items.map((li) => li.firstElementChild as HTMLElement);
     const rm = window.matchMedia("(prefers-reduced-motion: reduce)");
     let raf = 0, visible = false, last = -1;
@@ -81,9 +82,6 @@ export function Problems() {
         const d = Math.min(3, acc), c = cardsEl[i];
         c.style.transform = rm.matches ? "" : `scale(${1 - 0.04 * d})`;
         c.style.setProperty("--recede", Math.min(1, d).toFixed(3));
-        // when the stack starts to leave, the pile behind the last card clears so only the last card travels out with the heading
-        const pushed = Math.max(0, tops[items.length - 1] - rects[items.length - 1].top);
-        c.style.opacity = i === items.length - 1 ? "" : String(Math.max(0, 1 - pushed / 36));
       }
     };
     const kick = () => { if (visible && !raf) raf = requestAnimationFrame(frame); };
