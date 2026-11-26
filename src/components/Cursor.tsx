@@ -1,30 +1,45 @@
 "use client";
 import { useEffect, useRef } from "react";
 
-/* A square at the pointer with a red hairline running across the page in each direction through it, like a crosshair.
-   The square grows over anything clickable and inverts against what is under it. Fine pointers only. */
+/* A solid square at the pointer, with a short trail of hollow squares that follow it in a chain and fade out.
+   The trail squares invert against what is under them, so they read on light and dark. Fine pointers only. */
+const N = 6;
 export function Cursor() {
-  const dot = useRef<HTMLDivElement>(null);
-  const lh = useRef<HTMLDivElement>(null);
-  const lv = useRef<HTMLDivElement>(null);
+  const head = useRef<HTMLDivElement>(null);
+  const tr = useRef<(HTMLDivElement | null)[]>([]);
   useEffect(() => {
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
-    const root = document.documentElement, d = dot.current!, h = lh.current!, v = lv.current!;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      tr.current.forEach((t) => t && (t.style.display = "none"));
+    }
+    const root = document.documentElement, hd = head.current!;
     let x = -100, y = -100, raf = 0, shown = false, hot = false, down = false;
-    const apply = () => {
-      d.style.transform = `translate3d(${x}px,${y}px,0) translate(-50%,-50%) scale(${down ? 0.7 : hot ? 1.6 : 1})`;
-      h.style.transform = `translate3d(0,${y}px,0)`; v.style.transform = `translate3d(${x}px,0,0)`;
+    const p = Array.from({ length: N }, () => ({ x: -100, y: -100 }));
+    const draw = () => {
+      hd.style.transform = `translate3d(${x}px,${y}px,0) translate(-50%,-50%) scale(${down ? 0.7 : hot ? 1.5 : 1})`;
+      p.forEach((q, i) => { const t = tr.current[i]; if (t) t.style.transform = `translate3d(${q.x}px,${q.y}px,0) translate(-50%,-50%) scale(${1 - i * 0.07})`; });
     };
-    const kick = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; apply(); }); };
+    const tick = () => {
+      let moving = false, px = x, py = y;
+      p.forEach((q) => {
+        const dx = px - q.x, dy = py - q.y;
+        q.x += dx * 0.28; q.y += dy * 0.28;
+        if (Math.abs(dx) + Math.abs(dy) > 0.3) moving = true;
+        px = q.x; py = q.y;
+      });
+      draw(); raf = moving ? requestAnimationFrame(tick) : 0;
+    };
+    const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
     const show = (on: boolean) => { if (on !== shown) { shown = on; root.classList.toggle("cur-on", on); } };
     const move = (e: PointerEvent) => {
-      x = e.clientX; y = e.clientY; if (!shown) show(true);
+      x = e.clientX; y = e.clientY;
+      if (!shown) { p.forEach((q) => { q.x = x; q.y = y; }); show(true); }
       const t = e.target as Element | null;
       hot = !!t?.closest("a,button,summary,label,[role=button],[data-cursor]");
       root.classList.toggle("cur-text", !!t?.closest("input,textarea,select,[contenteditable=true]"));
-      apply(); kick();
+      draw(); kick();
     };
-    const dn = () => { down = true; kick(); }, up = () => { down = false; kick(); };
+    const dn = () => { down = true; draw(); }, up = () => { down = false; draw(); };
     const out = (e: MouseEvent) => { if (!e.relatedTarget) show(false); };
     window.addEventListener("pointermove", move, { passive: true });
     window.addEventListener("pointerdown", dn); window.addEventListener("pointerup", up);
@@ -33,9 +48,10 @@ export function Cursor() {
   }, []);
   return (
     <>
-      <div className="cur-l cur-h" ref={lh} aria-hidden="true" />
-      <div className="cur-l cur-v" ref={lv} aria-hidden="true" />
-      <div className="cur-dot" ref={dot} aria-hidden="true" />
+      {Array.from({ length: N }, (_, i) => (
+        <div className="cur-t" key={i} ref={(el) => { tr.current[i] = el; }} style={{ ["--o" as string]: (0.95 - i * 0.15).toFixed(2) }} aria-hidden="true" />
+      ))}
+      <div className="cur-dot" ref={head} aria-hidden="true" />
     </>
   );
 }
