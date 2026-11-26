@@ -329,3 +329,15 @@ a{color:#202329}a:hover{color:#000}
 .tm-c h3{margin:20px 0 0;font-size:22px;line-height:1.25;font-weight:600;letter-spacing:-.01em}
 .tm-c p{margin:8px 0 0;max-width:36em;font-size:16px;line-height:1.55;color:var(--t2);text-wrap:pretty}
 @media (min-width:1024px){.tm-in{padding:80px 48px}.tm-g{grid-template-columns:1fr 1fr;gap:28px}}
+/* cursor */
+.cur-dot,.cur-ring{position:fixed;left:0;top:0;z-index:2147483000;pointer-events:none;opacity:0;mix-blend-mode:difference;transition:opacity .25s ease}
+.cur-dot{width:6px;height:6px;border-radius:50%;background:#fff;transition:opacity .25s ease,transform .18s cubic-bezier(.22,1,.36,1)}
+.cur-ring{width:30px;height:30px;border-radius:50%;border:1px solid #fff;display:grid;place-items:center;transition:opacity .25s ease,background-color .25s ease,border-color .25s ease}
+.cur-ring span{font-size:5px;font-weight:600;letter-spacing:.02em;color:#fff;white-space:nowrap;opacity:0;transition:opacity .2s ease}
+.cur-ring.is-hot{background:rgba(255,255,255,.14)}
+.cur-ring.is-down{background:rgba(255,255,255,.35)}
+.cur-on .cur-dot,.cur-on .cur-ring{opacity:1}
+.cur-on:not(.cur-text),.cur-on:not(.cur-text) *{cursor:none!important}
+.cur-text .cur-dot,.cur-text .cur-ring{opacity:0}
+@media (hover:none),(pointer:coarse){.cur-dot,.cur-ring{display:none}}
+.cur-ring.has-t span{opacity:1}
