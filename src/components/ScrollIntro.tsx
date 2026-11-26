@@ -127,6 +127,12 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         if (sp) paint(sp, MUT, GREY);
       }
 
+      { // the headline belongs to the hero only: it stays out of frames 1 and 2 and writes in as the box lands on the hero
+        const hv = first ? 0 : ease(seg(c, 0.55, 1));
+        tx.style.clipPath = `inset(0 0 ${clampN((1 - hv) * 100)}% 0)`;
+        tx.style.visibility = hv <= 0 ? "hidden" : "";
+      }
+
       { // the opening statement, inside the dark box under the mark: it writes in with the headline and wipes away as the box starts to shrink
         const rvl = ld < 1 ? ease(seg(ld, 0.84, 1)) : 1, gone = first ? ease(seg(a, 0, 0.2)) : 1;
         sm.style.fontSize = (mob ? 20 : 26 * k) + "px";
