@@ -176,21 +176,17 @@ a{color:#202329}a:hover{color:#000}
 .sx-on .sx-fx{display:block;position:absolute;left:0;top:0;width:100%;height:100vh;overflow:hidden;pointer-events:none;z-index:40;opacity:var(--sxo,1)}
 .sx-done .sx-fx{visibility:hidden}
 .sx-ln{position:absolute;left:0;top:0;background:var(--line);will-change:transform}
-.sx-h{width:100%;height:1px;animation:sxX 1.1s cubic-bezier(.65,0,.35,1) both}
-.sx-v{width:1px;height:100%;animation:sxY 1.1s cubic-bezier(.65,0,.35,1) .1s both}
-.sx-lb,.sx-lr{animation-delay:.2s}
-@keyframes sxX{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0)}}
-@keyframes sxY{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0)}}
+.sx-h{width:100%;height:1px}
+.sx-v{width:1px;height:100%}
 .sx-cl{position:absolute;left:0;top:0;background:var(--line);z-index:1}
 .sx-ch{height:1px}.sx-cv{width:1px}
 .sx-box{position:absolute;left:0;top:0;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(20px,3.3vw,42px);background:var(--ink);will-change:transform,width,height}
 .sx-logo{position:absolute;left:0;top:0;z-index:41;display:none;transform-origin:0 0;pointer-events:none;color:#F1FF63;will-change:transform}
 .sx-on .sx-logo{display:inline-flex}.sx-done .sx-logo{visibility:hidden}
 .sx-on:not(.sx-done) .nav .logo{visibility:hidden}
-.sx-box p{font-size:var(--sxf,42px);font-weight:600;line-height:1.2;color:var(--sxt,#FBFAF9)}
+.sx-box p{opacity:var(--sxtx,1);font-size:var(--sxf,42px);font-weight:600;line-height:1.2;color:var(--sxt,#FBFAF9)}
 .sx-box p span{color:var(--sxs,#999B93)}
-.sx-bar{position:absolute;left:0;top:0;width:46px;height:6px;margin:-3px 0 0 -46px;transform-origin:100% 50%;background:var(--ink);z-index:3;will-change:transform;animation:sxB .5s cubic-bezier(.22,1,.36,1) .9s both}
-@keyframes sxB{from{opacity:0}to{opacity:1}}
+.sx-bar{position:absolute;left:0;top:0;width:46px;height:6px;margin:-3px 0 0 -46px;transform-origin:100% 50%;background:var(--ink);z-index:3;will-change:transform}
 .sx-prev{position:absolute;right:4%;top:0;z-index:4;display:flex;width:min(340px,42vw);height:min(190px,24vw);opacity:0;box-shadow:0 0 0 1px var(--line)}
 .sx-prev .t{flex:1;padding:16px;display:flex;flex-direction:column;justify-content:space-between}
 .sx-prev .co{font-size:12px;font-weight:600}
@@ -198,4 +194,6 @@ a{color:#202329}a:hover{color:#000}
 .sx-prev .ph{width:34%;background:var(--ink)}
 .sx-cl,.sx-box,.sx-bar{position:absolute}
 @media (max-width:759px){.sx-prev{width:70vw;height:140px;right:16px}}
-@media (prefers-reduced-motion:reduce){.sx-h,.sx-v,.sx-bar{animation:none}}
+html{scrollbar-gutter:stable}
+.sx:not(.sx-on):not(.sx-off) .sx-page{opacity:0;animation:sxShow 0s 4s forwards}
+@keyframes sxShow{to{opacity:1}}
