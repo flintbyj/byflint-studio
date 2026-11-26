@@ -242,9 +242,76 @@ export function Services() {
 
 /* ---------- The people behind the work ---------- */
 const people = [
-  { ini: "JG", name: "Jatin Gupta", bio: "Five years designing products, 25+ shipped across 6 industries, from battery swapping to health and beauty retail and consumer health. Rebuilt four Indofast Energy panels into one design system and cut their approvals to two steps. Founded Flint Studio in Delhi in 2025." },
-  { ini: "TG", name: "Taarush Goyal", bio: "Three years at Onething Design, on Royal Enfield, TVS, Ashok Leyland, Jio Institute and Apnamart’s point-of-sale system. Studied psychology." },
+  { ini: "JG", name: "Jatin Gupta", n: "01", bio: "Five years designing products, 25+ shipped across 6 industries, from battery swapping to health and beauty retail and consumer health. Rebuilt four Indofast Energy panels into one design system and cut their approvals to two steps. Founded Flint Studio in Delhi in 2025." },
+  { ini: "TG", name: "Taarush Goyal", n: "02", dark: true, lines: true, bio: "Three years at Onething Design, on Royal Enfield, TVS, Ashok Leyland, Jio Institute and Apnamart’s point-of-sale system. Studied psychology." },
 ];
+
+/* A portrait that resolves out of big pixel blocks. Add `photo` (a file in /public/team) and it pixelates the photo; without one it resolves the initials. */
+const LEVELS = [64, 44, 30, 20, 13, 8, 5, 3, 1];
+function PixelPortrait({ name, ini, n, photo, dark, lines }: { name: string; ini: string; n: string; photo?: string; dark?: boolean; lines?: boolean }) {
+  const box = useRef<HTMLDivElement>(null);
+  const cv = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const el = box.current!, c = cv.current!, ctx = c.getContext("2d")!;
+    const base = document.createElement("canvas"), sm = document.createElement("canvas");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let img: HTMLImageElement | null = null, lvl = reduce ? LEVELS.length - 1 : 0, raf = 0, dpr = 1;
+    const paintBase = () => {
+      const w = base.width, h = base.height, bctx = base.getContext("2d")!;
+      bctx.fillStyle = dark ? "#202329" : "#F0EFEC"; bctx.fillRect(0, 0, w, h);
+      if (img) {
+        const r = Math.max(w / img.naturalWidth, h / img.naturalHeight), iw = img.naturalWidth * r, ih = img.naturalHeight * r;
+        bctx.drawImage(img, (w - iw) / 2, (h - ih) * 0.3, iw, ih);
+      } else {
+        bctx.fillStyle = dark ? "#FBFAF9" : "#202329"; bctx.font = `600 ${h * 0.46}px "Plus Jakarta Sans", system-ui, sans-serif`;
+        bctx.textAlign = "center"; bctx.textBaseline = "middle"; bctx.fillText(ini, w / 2, h / 2);
+      }
+    };
+    const draw = () => {
+      const w = c.width, h = c.height, b = Math.max(1, Math.round(LEVELS[lvl] * dpr));
+      ctx.imageSmoothingEnabled = false;
+      if (b <= 1) { ctx.drawImage(base, 0, 0); return; }
+      // one portrait resolves from square blocks, the other from long horizontal bands (the Flint lines)
+      const bw = lines ? b * 9 : b, bh = lines ? Math.max(1, Math.round(b / 3)) : b;
+      sm.width = Math.ceil(w / bw); sm.height = Math.ceil(h / bh);
+      const sctx = sm.getContext("2d")!; sctx.imageSmoothingEnabled = true; sctx.drawImage(base, 0, 0, sm.width, sm.height);
+      ctx.clearRect(0, 0, w, h); ctx.drawImage(sm, 0, 0, sm.width * bw, sm.height * bh);
+    };
+    const size = () => {
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      const w = Math.round(el.clientWidth * dpr), h = Math.round(el.clientHeight * dpr);
+      if (!w || !h) return;
+      c.width = base.width = w; c.height = base.height = h; paintBase(); draw();
+    };
+    const play = (from: number, ms: number) => {
+      cancelAnimationFrame(raf);
+      if (reduce) { lvl = LEVELS.length - 1; draw(); return; }
+      const t0 = performance.now();
+      const step = (now: number) => {
+        const p = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - p, 2);
+        const next = Math.round(from + (LEVELS.length - 1 - from) * e);
+        if (next !== lvl) { lvl = next; draw(); }
+        if (p < 1) raf = requestAnimationFrame(step);
+      };
+      lvl = from; draw(); raf = requestAnimationFrame(step);
+    };
+    size();
+    if (document.fonts?.ready) document.fonts.ready.then(() => { paintBase(); draw(); });
+    if (photo) { const im = new Image(); im.onload = () => { img = im; paintBase(); draw(); }; im.src = photo; }
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { play(0, 1800); io.disconnect(); } }, { threshold: 0.4 });
+    io.observe(el);
+    const hover = () => play(4, 900);
+    el.addEventListener("pointerenter", hover);
+    const ro = new ResizeObserver(size); ro.observe(el);
+    return () => { cancelAnimationFrame(raf); io.disconnect(); ro.disconnect(); el.removeEventListener("pointerenter", hover); };
+  }, [ini, photo, dark, lines]);
+  return (
+    <div className={"tm-ph" + (dark ? " dk" : "")} ref={box} role="img" aria-label={name}>
+      <canvas ref={cv} />
+      <span className="tm-tag"><i>{name.replace(" ", "_")}</i><b>{n}</b></span>
+    </div>
+  );
+}
 
 export function Team() {
   return (
@@ -255,7 +322,7 @@ export function Team() {
         <ul className="tm-g">
           {people.map((p) => (
             <li key={p.ini} className="tm-c rv">
-              <div className="tm-ph" aria-hidden="true">{p.ini}</div>
+              <PixelPortrait name={p.name} ini={p.ini} n={p.n} dark={p.dark} lines={p.lines} />
               <h3>{p.name}</h3>
               <p>{p.bio}</p>
             </li>
