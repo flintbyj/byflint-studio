@@ -1,13 +1,9 @@
-"use client";
-import { useState } from "react";
 import { Mark, Arrow, Row } from "./Mark";
 import { cases } from "@/lib/content";
 
 export function Hero() {
-  const [play, setPlay] = useState(true);
-  const replay = () => { setPlay(false); requestAnimationFrame(() => requestAnimationFrame(() => setPlay(true))); };
   return (
-    <section className={play ? "play" : ""} aria-label="Intro">
+    <section aria-label="Intro">
       <Row className="hero">
         <span className="bar v" style={{ left: -3, top: 265 }} />
         <span className="bar v" style={{ right: -3, bottom: 45 }} />
@@ -15,10 +11,6 @@ export function Hero() {
           <h1 className="h2">Design Bandwidth<br />for startups and scale-ups.<br /><span>Shipped in code.</span></h1>
         </div>
         <div className="cta hin d2"><a className="btn" href="https://cal.com/byflint">Available for Q1 2027 <Arrow /></a></div>
-        <div className="intro" aria-hidden="true">
-          <div className="panel"><span className="m"><Mark width={40} height={48} /></span><p>Design Bandwidth<br />for startups and scale-ups.<br /><span>Shipped in code.</span></p></div>
-        </div>
-        <button className="replay" type="button" onClick={replay}>Replay intro</button>
       </Row>
       <div className="work" id="work">
         <div className="track">
