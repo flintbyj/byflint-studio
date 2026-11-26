@@ -1,7 +1,8 @@
 import { Mark } from "@/components/Mark";
 import { Hero } from "@/components/Hero";
 import { ScrollIntro } from "@/components/ScrollIntro";
-import { Logos, Marquee, Services, Problems, Testimonial } from "@/components/Sections";
+import { Logos, Marquee } from "@/components/Sections";
+import { Services, Problems, Testimonial } from "@/components/Taarush";
 import { Faq } from "@/components/Faq";
 import { Footer } from "@/components/Footer";
 import { Reveal } from "@/components/Reveal";
@@ -20,11 +21,11 @@ export default function Home() {
       </ScrollIntro>
       <Logos />
       <Marquee />
-      <div id="services"><Services /></div>
-      <Problems />
       <Testimonial which="indofast" />
-      <Faq />
+      <Problems />
+      <div id="services"><Services /></div>
       <Testimonial which="vlcc" />
+      <Faq />
       <Footer />
     </div>
   );
