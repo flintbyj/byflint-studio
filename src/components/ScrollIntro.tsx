@@ -89,7 +89,8 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
       b.style.transform = `translate(${r.x}px,${r.y}px)`;
       b.style.width = r.w + "px";
       b.style.height = r.h + "px";
-      b.style.background = mix(INK, BG, a);
+      { const pc = (clampN(a * 100)).toFixed(2) + "%"; // hard-edged sweep (dark -> light), no grey blend
+        b.style.background = a <= 0.001 ? "rgb(32,35,41)" : a >= 0.999 ? "rgb(251,250,249)" : `linear-gradient(180deg,rgb(251,250,249) ${pc},rgb(32,35,41) ${pc})`; }
       // one headline for the whole intro: rides in the box, then lands exactly on the hero's own h1 (which stays hidden until then)
       const hh = q(".hero h1"), hr = hh?.getBoundingClientRect();
       const hFs = hh ? parseFloat(getComputedStyle(hh).fontSize) : 42;
@@ -102,10 +103,22 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
       tx.style.fontSize = tF + "px";
       tx.style.width = tW + "px";
       tx.style.whiteSpace = mob ? "normal" : "nowrap";
-      tx.style.color = mix(BG, INK, a);
-      tx.style.setProperty("--sxs", mix(GREY, MUT, a));
+      const tl = a >= 0.999;
+      tx.style.color = tl ? `rgb(${INK})` : `rgb(${BG})`;
+      tx.style.setProperty("--sxs", tl ? `rgb(${MUT})` : `rgb(${GREY})`);
       tx.style.left = tX + "px";
       tx.style.top = tB - tx.getBoundingClientRect().height + "px";
+      { // the colour change rides the same hard sweep as the box: each line flips exactly where the edge crosses it
+        const sweepY = r.y + a * r.h, sp = tx.querySelector("span") as HTMLElement;
+        const paint = (el: HTMLElement, c1: number[], c2: number[]) => {
+          if (a <= 0.001 || a >= 0.999) { el.style.backgroundImage = ""; el.style.webkitTextFillColor = ""; (el.style as CSSStyleDeclaration).backgroundClip = ""; return; }
+          const rc = el.getBoundingClientRect(), pp = (sweepY - rc.top).toFixed(1) + "px";
+          el.style.backgroundImage = `linear-gradient(180deg,rgb(${c1}) ${pp},rgb(${c2}) ${pp})`;
+          el.style.backgroundClip = "text"; el.style.webkitTextFillColor = "transparent";
+        };
+        paint(tx, INK, BG);
+        if (sp) paint(sp, MUT, GREY);
+      }
 
       const cs = Math.min(131 * (mob ? 0.6 : k), s2.h * 0.3); // logo cell size, used only to centre the mark
 
@@ -121,7 +134,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         lx = lerp(s2.x + o2.x, T.x, g); ly = lerp(s2.y + o2.y, T.y, g); ls = lerp(f2, 1, g);
       }
       lg.style.transform = `translate(${lx}px,${ly}px) scale(${ls})`;
-      lg.style.color = mix(CIT, SLATE, a);
+      lg.style.color = a > 0.14 ? `rgb(${SLATE})` : `rgb(${CIT})`;
 
       const rx = r.x + r.w, by = r.y + r.h;
       const v1Rest = mob ? s2.y - 60 : Y(58), v2Rest = mob ? s2.y + s2.h + 14 : Y(728);
