@@ -22,6 +22,7 @@ a{color:#202329}a:hover{color:#000}
 .nav a{text-decoration:none;font-size:18px;font-weight:500}
 .nav .l{display:flex;gap:30px}
 .nav .logo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#53627A;display:flex}
+.nav .logo svg{width:35.37px;height:43.02px}
 /* hero */
 .hero .mid{height:455px}
 .hero .copy{position:absolute;left:3.8%;bottom:42px}
@@ -182,11 +183,13 @@ a{color:#202329}a:hover{color:#000}
 @keyframes sxY{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0)}}
 .sx-cl{position:absolute;left:0;top:0;background:var(--line);z-index:1}
 .sx-ch{height:1px}.sx-cv{width:1px}
-.sx-box{position:absolute;left:0;top:0;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(20px,3.3vw,42px);background:var(--ink);will-change:transform,width,height}
-.sx-m{color:var(--sxm,#F1FF63);display:inline-flex}
+.sx-box{position:absolute;left:0;top:0;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(20px,3.3vw,42px);background:var(--ink);will-change:transform,width,height}
+.sx-logo{position:absolute;left:0;top:0;z-index:41;display:none;transform-origin:0 0;pointer-events:none;color:#F1FF63;will-change:transform}
+.sx-on .sx-logo{display:inline-flex}.sx-done .sx-logo{visibility:hidden}
+.sx-on:not(.sx-done) .nav .logo{visibility:hidden}
 .sx-box p{font-size:var(--sxf,42px);font-weight:600;line-height:1.2;color:var(--sxt,#FBFAF9)}
 .sx-box p span{color:var(--sxs,#999B93)}
-.sx-bar{position:absolute;left:0;top:0;width:6px;height:46px;background:var(--ink);z-index:3;will-change:transform;animation:sxB .5s cubic-bezier(.22,1,.36,1) .9s both}
+.sx-bar{position:absolute;left:0;top:0;width:46px;height:6px;margin:-3px 0 0 -46px;transform-origin:100% 50%;background:var(--ink);z-index:3;will-change:transform;animation:sxB .5s cubic-bezier(.22,1,.36,1) .9s both}
 @keyframes sxB{from{opacity:0}to{opacity:1}}
 .sx-prev{position:absolute;right:4%;top:0;z-index:4;display:flex;width:min(340px,42vw);height:min(190px,24vw);opacity:0;box-shadow:0 0 0 1px var(--line)}
 .sx-prev .t{flex:1;padding:16px;display:flex;flex-direction:column;justify-content:space-between}
