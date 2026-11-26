@@ -159,16 +159,17 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
       const mt = ld < 1 ? ld : p < 0.5 ? 1 + seg(p, 0, 0.45) : 2 + seg(p, 0.5, 0.9);
       type Sg = { h: boolean; c: number; f: number; t: number; w: number[]; rv?: number[]; sc?: boolean };
       const S = (v: number) => v * k;
-      const hy = s3.y, hb = s3.y + s3.h; 
+      const hy = s3.y - 1, hb = s3.y + s3.h - 1, ret = first ? 0 : ease(seg(c, 0.5, 1)); // -1: the page draws its borders on the last pixel of the cell, so the handover lands on the same pixel
+      
       const segs: Sg[] = [
         // pinwheel arms, drawn by the loader (each leaves a different corner, along the whole box edge and out to the screen edge)
-        { h: false, c: r.x - 1, f: by, t: 0, w: [0, 0.6] },
+        { h: false, c: r.x - 1, f: by, t: lerp(0, r.y - 1, ret), w: [0, 0.6] },
         { h: true, c: r.y - 1, f: r.x, t: vw, w: [0.05, 0.65] },
         { h: false, c: rx, f: r.y, t: vh, w: [0.02, 0.62] },
-        { h: true, c: by, f: rx, t: 0, w: [0.07, 0.67] },
+        { h: true, c: by - 1, f: rx, t: 0, w: [0.07, 0.67] },
         // the other halves of the box-edge lines: drawn with the rest in the opening, so the lines are complete from the first view and later only move
         { h: false, c: r.x - 1, f: by, t: vh, w: [0.1, 0.6] },
-        { h: true, c: by, f: rx, t: vw, w: [0.12, 0.62] },
+        { h: true, c: by - 1, f: rx, t: vw, w: [0.12, 0.62] },
       ];
       if (!mob) {
         // one grid for the whole intro. It is drawn once in the opening view (a bar runs each line in) and never taken back:
@@ -179,7 +180,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         // right cell becomes the right column (its right edge is the screen edge), so each line ends up on a line the page already has.
         const hx = s3.x;
         segs.push(
-          { h: false, c: m(X(148), X(200), hx), f: 0, t: m(Y(285), Y(285), hy), w: [0.15, 0.7] },
+          { h: false, c: m(X(148), X(200), hx - 1), f: lerp(0, m(Y(285), Y(285), hy), ret), t: m(Y(285), Y(285), hy), w: [0.15, 0.7] },
           { h: true, c: m(Y(285), Y(285), hy), f: 0, t: r.x, w: [0.2, 0.75] },
           { h: true, c: m(Y(517), Y(472), hb), f: 0, t: r.x, w: [0.25, 0.8] },
           { h: true, c: m(Y(540), Y(540), hy), f: vw, t: rx, w: [0.3, 0.85] },
