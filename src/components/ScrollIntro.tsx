@@ -13,11 +13,12 @@ const INK = [32, 35, 41], BG = [251, 250, 249], CIT = [241, 255, 99], SLATE = [8
 
 /*
   Scroll-scrubbed intro (Figma "Exploration - Hardcore", intro frames 1, 2, 3).
-  Grid lines run along every edge of the box. The two black bars are the builders:
-  they start lying on the lines exactly where Figma frame 1 puts them, slide to the
-  box corner, turn it and keep travelling along the crossing line, then land on the
-  hero's own bars. The Flint mark rides in the box, then flies up to the nav logo
-  (no fade) and is swapped for the real one only when it has arrived.
+  The grid is a pinwheel: every line leaves a different corner of the box (frames 1 and 2), and frame 2 adds the
+  cell lines in the side areas. Every line segment is drawn by its own black bar: the bar runs along the line, the
+  line shows only where the bar has been, and the bar leaves the screen. On the way to the hero the side cells are
+  taken back the same way (bars run in and erase them) and the pinwheel arms grow into the full page lines.
+  Two longer-lived bars (V1, V2) come in along the box edges and land on the hero's own bars. The Flint mark and the
+  headline travel with the box and land on the real nav logo and h1 without any fade.
   Scroll sets a target; the drawing eases toward it every frame so it never jumps.
 */
 export function ScrollIntro({ children }: { children: React.ReactNode }) {
@@ -32,11 +33,11 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { w.classList.add("sx-off"); return; }
     w.classList.add("sx-on");
     const q = (s: string) => st.querySelector(s) as HTMLElement;
-    const lnT = q(".sx-lt"), lnB = q(".sx-lb"), lnL = q(".sx-ll"), lnR = q(".sx-lr");
+    const sgL = Array.from(st.querySelectorAll<HTMLElement>(".sx-sg")), sgB = Array.from(st.querySelectorAll<HTMLElement>(".sx-sb"));
     const navA = Array.from(st.querySelectorAll<HTMLElement>(".nav .l a, .nav > a:last-child"));
     const ctaEl = st.querySelector<HTMLElement>(".hero .cta");
     const cardEls = Array.from(st.querySelectorAll<HTMLElement>(".work .card"));
-    const bH1 = q(".sx-h1"), bH2 = q(".sx-h2"), bV1 = q(".sx-v1"), bV2 = q(".sx-v2");
+    const bV1 = q(".sx-v1"), bV2 = q(".sx-v2");
     let cur = 0, raf = 0, ld = 1, lraf = 0;
     const root = document.documentElement;
     const clampN = (v: number) => Math.min(100, Math.max(0, v));
@@ -90,10 +91,6 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
       tx.style.left = tX + "px";
       tx.style.top = tB - tx.getBoundingClientRect().height + "px";
 
-      lnT.style.transform = `translateY(${r.y - 1}px)`;
-      lnB.style.transform = `translateY(${r.y + r.h}px)`;
-      lnL.style.transform = `translateX(${r.x - 1}px)`;
-      lnR.style.transform = `translateX(${r.x + r.w}px)`;
       const cs = Math.min(131 * (mob ? 0.6 : k), s2.h * 0.3); // logo cell size, used only to centre the mark
 
       // the Flint mark: inside the box (frame 1) -> centred in the logo cell (frame 2) -> nav (frame 3)
@@ -110,43 +107,81 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
       lg.style.transform = `translate(${lx}px,${ly}px) scale(${ls})`;
       lg.style.color = mix(CIT, SLATE, a);
 
-      // builder bars, one axis each. H1 sits on the bottom line, H2 on the top line, V1 on the left line, V2 on the right line.
       const rx = r.x + r.w, by = r.y + r.h;
       const v1Rest = mob ? s2.y - 60 : Y(58), v2Rest = mob ? s2.y + s2.h + 14 : Y(728);
       const OFF = 60;
-      // H bars only exist during the opening loader (they draw the top and bottom lines and leave); V bars come in on scroll 1.
-      let h1x = -OFF, h2x = vw + 10, v1y = -OFF, v2y = vh + 10;
+      // V1 / V2: come in along the left and right box edges on scroll 1 and land on the hero's own bars
+      let v1y = -OFF, v2y = vh + 10;
       if (first) {
         const en = ease(seg(a, 0.3, 1));
         v1y = lerp(-OFF, v1Rest, en); v2y = lerp(vh + 10, v2Rest, en);
       } else {
         v1y = lerp(v1Rest, tL.y, c); v2y = lerp(v2Rest, tR.y, c);
       }
+      bV1.style.transform = `translate(${r.x - 3}px,${v1y}px)`;
+      bV2.style.transform = `translate(${rx - 3}px,${v2y}px)`;
 
-      // opening loader (ld 0 -> 1): each bar draws its own line, end to end, and leaves the screen. V1 runs down the left line,
-      // V2 up the right line, H1 right to left along the bottom line, H2 left to right along the top line. Lines show only
-      // where a bar has been. Then the colour wipes into the box, then the text.
+      // master time m: 0..1 opening loader, 1..2 scroll 1 (shrink), 2..3 scroll to the hero
+      const mt = ld < 1 ? ld : p < 0.5 ? 1 + seg(p, 0, 0.45) : 2 + seg(p, 0.5, 0.9);
+      type Sg = { h: boolean; c: number; f: number; t: number; w: number[]; rv?: number[] };
+      const S = (v: number) => v * k;
+      const segs: Sg[] = [
+        // pinwheel arms, drawn by the loader (each leaves a different corner, along the whole box edge and out to the screen edge)
+        { h: false, c: r.x - 1, f: by, t: 0, w: [0, 0.6] },
+        { h: true, c: r.y - 1, f: r.x, t: vw, w: [0.05, 0.65] },
+        { h: false, c: rx, f: r.y, t: vh, w: [0.02, 0.62] },
+        { h: true, c: by, f: rx, t: 0, w: [0.07, 0.67] },
+        // growth into the full page lines while the box becomes the hero
+        { h: false, c: r.x - 1, f: by, t: vh, w: [2.3, 2.8] },
+        { h: true, c: r.y - 1, f: r.x, t: 0, w: [2.3, 2.8] },
+        { h: false, c: rx, f: r.y, t: 0, w: [2.35, 2.85] },
+        { h: true, c: by, f: rx, t: vw, w: [2.35, 2.85] },
+      ];
+      if (!mob) {
+        const c1 = s2.y + S(131), c2 = s2.y + S(319), c3 = s2.y + S(388);
+        // frame 2 cell lines in the side areas: drawn on scroll 1, taken back on the way to the hero
+        segs.push(
+          { h: true, c: c1, f: r.x, t: 0, w: [1.35, 1.7], rv: [2.0, 2.25] },
+          { h: true, c: c2, f: r.x, t: 0, w: [1.45, 1.8], rv: [2.05, 2.3] },
+          { h: false, c: s2.x - S(179), f: c1, t: 0, w: [1.6, 1.95], rv: [2.0, 2.25] },
+          { h: true, c: c3, f: rx, t: vw, w: [1.45, 1.8], rv: [2.05, 2.3] },
+          { h: false, c: s2.x + s2.w + S(195), f: c3, t: vh, w: [1.6, 1.95], rv: [2.1, 2.35] },
+        );
+      }
+      segs.forEach((g, i) => {
+        const le = sgL[i], be = sgB[i];
+        if (!le || !be) return;
+        let u = ease(seg(mt, g.w[0], g.w[1]));
+        if (g.rv) u *= 1 - ease(seg(mt, g.rv[0], g.rv[1]));
+        const dir = Math.sign(g.t - g.f) || 1, len = Math.abs(g.t - g.f);
+        const tip = g.f + dir * (len + OFF) * u;
+        const ve = dir > 0 ? Math.min(tip, g.t) : Math.max(tip, g.t), vl = Math.abs(ve - g.f);
+        const on = u > 0.0005 && vl > 0.5;
+        le.style.display = on ? "block" : "none";
+        if (on) {
+          le.style.width = (g.h ? vl : 1) + "px"; le.style.height = (g.h ? 1 : vl) + "px";
+          le.style.transform = g.h ? `translate(${Math.min(g.f, ve)}px,${g.c}px)` : `translate(${g.c}px,${Math.min(g.f, ve)}px)`;
+        }
+        const tail = tip - dir * 46, shown = u > 0.0005 && dir * (tail - g.t) < 0;
+        be.style.display = shown ? "block" : "none";
+        if (shown) {
+          be.style.width = (g.h ? 46 : 6) + "px"; be.style.height = (g.h ? 6 : 46) + "px";
+          const lo = Math.min(tip, tail);
+          be.style.transform = g.h ? `translate(${lo}px,${g.c - 2.5}px)` : `translate(${g.c - 2.5}px,${lo}px)`;
+        }
+      });
+
+      // opening loader (ld 0 -> 1): the arms draw first; then the colour wipes into the box, then the text comes in
       if (ld < 1) {
-        const f = ease(seg(ld, 0, 0.62));
-        v1y = lerp(-OFF, vh + 10, f); v2y = lerp(vh + 10, -OFF, f);
-        h1x = lerp(vw + 10, -OFF, f); h2x = lerp(-OFF, vw + 10, f);
-        lnL.style.clipPath = `inset(0 0 ${clampN((1 - (v1y + 46) / vh) * 100)}% 0)`;
-        lnR.style.clipPath = `inset(${clampN((v2y / vh) * 100)}% 0 0 0)`;
-        lnB.style.clipPath = `inset(0 0 0 ${clampN((h1x / vw) * 100)}%)`;
-        lnT.style.clipPath = `inset(0 ${clampN(100 - ((h2x + 46) / vw) * 100)}% 0 0)`;
         const rv = ease(seg(ld, 0.58, 0.88)), tf = ease(seg(ld, 0.82, 1));
         b.style.clipPath = `inset(${clampN((1 - rv) * 100)}% 0 0 0)`;
         tx.style.opacity = String(tf);
         lg.style.opacity = String(tf);
       } else {
-        for (const el of [lnL, lnR, lnT, lnB, b]) el.style.clipPath = "";
+        b.style.clipPath = "";
         tx.style.opacity = "1";
         lg.style.opacity = "1";
       }
-      bH1.style.transform = `translate(${h1x}px,${by - 2.5}px)`;
-      bH2.style.transform = `translate(${h2x}px,${r.y - 3.5}px)`;
-      bV1.style.transform = `translate(${r.x - 3}px,${v1y}px)`;
-      bV2.style.transform = `translate(${rx - 3}px,${v2y}px)`;
 
       // the rest of the first screen builds in while the box lands: nav links drop in, the button and the cards
       // rise on staggered starts (slide + wipe, not a page fade). Cleared at the end so the real styles take over.
@@ -204,11 +239,11 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
       <div className="sx-stage" ref={stage}>
         <div className="sx-page">{children}</div>
         <div className="sx-fx" aria-hidden="true">
-          <span className="sx-ln sx-h sx-lt" /><span className="sx-ln sx-h sx-lb" />
-          <span className="sx-ln sx-v sx-ll" /><span className="sx-ln sx-v sx-lr" />
+          {Array.from({ length: 13 }, (_, i) => <span key={"l" + i} className="sx-sg" />)}
           <div className="sx-box" ref={box}>
           </div>
-          <span className="sx-bar sx-bh sx-h1" /><span className="sx-bar sx-bh sx-h2" /><span className="sx-bar sx-bv sx-v1" /><span className="sx-bar sx-bv sx-v2" />
+          {Array.from({ length: 13 }, (_, i) => <span key={"b" + i} className="sx-sb" />)}
+          <span className="sx-bar sx-bv sx-v1" /><span className="sx-bar sx-bv sx-v2" />
         </div>
         <h1 className="sx-txt" ref={txtR} aria-hidden="true">Design Bandwidth<br />for startups and scale-ups.<br /><span>Shipped in code.</span></h1>
         <span className="sx-logo" ref={logo} aria-hidden="true"><Mark width={MW} height={MH} /></span>
