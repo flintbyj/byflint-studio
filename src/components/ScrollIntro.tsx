@@ -157,7 +157,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
 
       // master time m: 0..1 opening loader, 1..2 scroll 1 (shrink), 2..3 scroll to the hero
       const mt = ld < 1 ? ld : p < 0.5 ? 1 + seg(p, 0, 0.45) : 2 + seg(p, 0.5, 0.9);
-      type Sg = { h: boolean; c: number; f: number; t: number; w: number[]; rv?: number[] };
+      type Sg = { h: boolean; c: number; f: number; t: number; w: number[]; rv?: number[]; sc?: boolean };
       const S = (v: number) => v * k;
       const segs: Sg[] = [
         // pinwheel arms, drawn by the loader (each leaves a different corner, along the whole box edge and out to the screen edge)
@@ -166,10 +166,10 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         { h: false, c: rx, f: r.y, t: vh, w: [0.02, 0.62] },
         { h: true, c: by, f: rx, t: 0, w: [0.07, 0.67] },
         // growth into the full page lines while the box becomes the hero
-        { h: false, c: r.x - 1, f: by, t: vh, w: [2.3, 2.8] },
-        { h: true, c: r.y - 1, f: r.x, t: 0, w: [2.3, 2.8] },
-        { h: false, c: rx, f: r.y, t: 0, w: [2.35, 2.85] },
-        { h: true, c: by, f: rx, t: vw, w: [2.35, 2.85] },
+        { h: false, c: r.x - 1, f: by, t: vh, w: [2.3, 2.8], sc: true },
+        { h: true, c: r.y - 1, f: r.x, t: 0, w: [2.3, 2.8], sc: true },
+        { h: false, c: rx, f: r.y, t: 0, w: [2.35, 2.85], sc: true },
+        { h: true, c: by, f: rx, t: vw, w: [2.35, 2.85], sc: true },
       ];
       if (!mob) {
         // one grid for the whole intro. It is drawn once in the opening view (a bar runs each line in) and never taken back:
@@ -191,6 +191,17 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         if (!le || !be) return;
         // every line starts at a fixed place (the screen edge or the box corner), a bar runs it to the far end and carries on out;
         // taking a line back works the same way: the bar runs the same direction again and eats the line from its start
+        if (g.sc) { // box-edge lines that run on to the page edges: they grow with the scroll itself, so no bars and nothing pops in
+          const q = first ? 0 : c, dr2 = Math.sign(g.t - g.f) || 1, ln = Math.abs(g.t - g.f) * q;
+          be.style.display = "none";
+          le.style.display = ln > 0.5 ? "block" : "none";
+          if (ln > 0.5) {
+            const e0 = g.f + dr2 * ln, lo2 = Math.min(g.f, e0);
+            le.style.width = (g.h ? ln : 1) + "px"; le.style.height = (g.h ? 1 : ln) + "px";
+            le.style.transform = g.h ? `translate(${lo2}px,${g.c}px)` : `translate(${g.c}px,${lo2}px)`;
+          }
+          return;
+        }
         const wantD = mt >= g.w[0] ? 1 : 0, wantE = g.rv && mt >= g.rv[0] ? 1 : 0;
         dS[i] = toward(dS[i] ?? 0, wantD, dts / LDUR);
         eS[i] = toward(eS[i] ?? 0, wantD ? wantE : 0, dts / LDUR);
