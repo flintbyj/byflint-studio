@@ -246,65 +246,68 @@ const people = [
   { ini: "TG", name: "Taarush Goyal", n: "02", dark: true, lines: true, bio: "Three years at Onething Design, on Royal Enfield, TVS, Ashok Leyland, Jio Institute and Apnamart’s point-of-sale system. Studied psychology." },
 ];
 
-/* A portrait that resolves out of big pixel blocks. Add `photo` (a file in /public/team) and it pixelates the photo; without one it resolves the initials. */
-const LEVELS = [64, 44, 30, 20, 13, 8, 5, 3, 1];
-function PixelPortrait({ name, ini, n, photo, dark, lines }: { name: string; ini: string; n: string; photo?: string; dark?: boolean; lines?: boolean }) {
+/* A pixel-art portrait that builds itself cell by cell, top to bottom (after the animated pixel portrait reference). Add `photo` (a file in /public/team) and it dithers the real photo; without one it draws a stand-in bust. */
+const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+function PixelPortrait({ name, n, photo, dark, flip }: { name: string; n: string; photo?: string; dark?: boolean; flip?: boolean }) {
   const box = useRef<HTMLDivElement>(null);
   const cv = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const el = box.current!, c = cv.current!, ctx = c.getContext("2d")!;
-    const base = document.createElement("canvas"), sm = document.createElement("canvas");
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let img: HTMLImageElement | null = null, lvl = reduce ? LEVELS.length - 1 : 0, raf = 0, dpr = 1;
-    const paintBase = () => {
-      const w = base.width, h = base.height, bctx = base.getContext("2d")!;
-      bctx.fillStyle = dark ? "#202329" : "#F0EFEC"; bctx.fillRect(0, 0, w, h);
+    const COLS = 56;
+    let img: HTMLImageElement | null = null, on: Uint8Array = new Uint8Array(0), t: Float32Array = new Float32Array(0), rows = 0, cs = 1, prog = reduce ? 1 : 0, raf = 0;
+    const bg = dark ? "#202329" : "#F0EFEC", fg = dark ? "#F1FF63" : "#202329";
+    const build = () => {
+      const w = el.clientWidth, h = el.clientHeight; if (!w || !h) return;
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+      cs = c.width / COLS; rows = Math.ceil(c.height / cs);
+      const sm = document.createElement("canvas"); sm.width = COLS; sm.height = rows;
+      const g = sm.getContext("2d", { willReadFrequently: true })!;
+      g.fillStyle = "#fff"; g.fillRect(0, 0, COLS, rows);
+      if (flip) { g.translate(COLS, 0); g.scale(-1, 1); }
       if (img) {
-        const r = Math.max(w / img.naturalWidth, h / img.naturalHeight), iw = img.naturalWidth * r, ih = img.naturalHeight * r;
-        bctx.drawImage(img, (w - iw) / 2, (h - ih) * 0.3, iw, ih);
-      } else {
-        bctx.fillStyle = dark ? "#FBFAF9" : "#202329"; bctx.font = `600 ${h * 0.46}px "Plus Jakarta Sans", system-ui, sans-serif`;
-        bctx.textAlign = "center"; bctx.textBaseline = "middle"; bctx.fillText(ini, w / 2, h / 2);
+        const r = Math.max(COLS / img.naturalWidth, rows / img.naturalHeight), iw = img.naturalWidth * r, ih = img.naturalHeight * r;
+        g.filter = "grayscale(1) contrast(1.15)"; g.drawImage(img, (COLS - iw) / 2, (rows - ih) * 0.25, iw, ih); g.filter = "none";
+      } else { // stand-in bust: head, neck, shoulders, shaded so the dither has texture
+        const gr = g.createLinearGradient(0, rows * 0.15, COLS * 0.9, rows);
+        gr.addColorStop(0, "#9a9a9a"); gr.addColorStop(1, "#1c1c1c");
+        g.fillStyle = gr;
+        g.beginPath(); g.ellipse(COLS * 0.5, rows * 0.33, COLS * 0.16, rows * 0.2, 0, 0, Math.PI * 2); g.fill();
+        g.fillRect(COLS * 0.44, rows * 0.5, COLS * 0.12, rows * 0.14);
+        g.beginPath(); g.ellipse(COLS * 0.5, rows * 1.02, COLS * 0.4, rows * 0.4, 0, Math.PI, 0); g.fill();
       }
+      const d = g.getImageData(0, 0, COLS, rows).data;
+      on = new Uint8Array(COLS * rows); t = new Float32Array(COLS * rows);
+      for (let y = 0; y < rows; y++) for (let x = 0; x < COLS; x++) {
+        const i = y * COLS + x, lum = d[i * 4] / 255, th = (BAYER[(y % 4) * 4 + (x % 4)] + 0.5) / 16;
+        on[i] = lum < th * 0.9 ? 1 : 0;
+        t[i] = 0.62 * (y / rows) + 0.38 * Math.random();
+      }
+      paint();
     };
-    const draw = () => {
-      const w = c.width, h = c.height, b = Math.max(1, Math.round(LEVELS[lvl] * dpr));
-      ctx.imageSmoothingEnabled = false;
-      if (b <= 1) { ctx.drawImage(base, 0, 0); return; }
-      // one portrait resolves from square blocks, the other from long horizontal bands (the Flint lines)
-      const bw = lines ? b * 9 : b, bh = lines ? Math.max(1, Math.round(b / 3)) : b;
-      sm.width = Math.ceil(w / bw); sm.height = Math.ceil(h / bh);
-      const sctx = sm.getContext("2d")!; sctx.imageSmoothingEnabled = true; sctx.drawImage(base, 0, 0, sm.width, sm.height);
-      ctx.clearRect(0, 0, w, h); ctx.drawImage(sm, 0, 0, sm.width * bw, sm.height * bh);
+    const paint = () => {
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.fillStyle = fg;
+      for (let y = 0; y < rows; y++) for (let x = 0; x < COLS; x++) { const i = y * COLS + x; if (on[i] && prog >= t[i]) ctx.fillRect(Math.floor(x * cs), Math.floor(y * cs), Math.ceil(cs), Math.ceil(cs)); }
     };
-    const size = () => {
-      dpr = Math.min(2, window.devicePixelRatio || 1);
-      const w = Math.round(el.clientWidth * dpr), h = Math.round(el.clientHeight * dpr);
-      if (!w || !h) return;
-      c.width = base.width = w; c.height = base.height = h; paintBase(); draw();
-    };
-    const play = (from: number, ms: number) => {
+    const run = (ms: number) => {
       cancelAnimationFrame(raf);
-      if (reduce) { lvl = LEVELS.length - 1; draw(); return; }
-      const t0 = performance.now();
-      const step = (now: number) => {
-        const p = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - p, 2);
-        const next = Math.round(from + (LEVELS.length - 1 - from) * e);
-        if (next !== lvl) { lvl = next; draw(); }
-        if (p < 1) raf = requestAnimationFrame(step);
-      };
-      lvl = from; draw(); raf = requestAnimationFrame(step);
+      if (reduce) { prog = 1; paint(); return; }
+      for (let i = 0; i < t.length; i++) t[i] = 0.62 * (Math.floor(i / COLS) / rows) + 0.38 * Math.random();
+      const t0 = performance.now(); prog = 0;
+      const step = (now: number) => { prog = Math.min(1.01, (now - t0) / ms); paint(); if (prog < 1.01) raf = requestAnimationFrame(step); };
+      raf = requestAnimationFrame(step);
     };
-    size();
-    if (document.fonts?.ready) document.fonts.ready.then(() => { paintBase(); draw(); });
-    if (photo) { const im = new Image(); im.onload = () => { img = im; paintBase(); draw(); }; im.src = photo; }
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { play(0, 1800); io.disconnect(); } }, { threshold: 0.4 });
+    build();
+    if (photo) { const im = new Image(); im.onload = () => { img = im; build(); }; im.src = photo; }
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { run(2600); io.disconnect(); } }, { threshold: 0.4 });
     io.observe(el);
-    const hover = () => play(4, 900);
+    const hover = () => run(1500);
     el.addEventListener("pointerenter", hover);
-    const ro = new ResizeObserver(size); ro.observe(el);
+    const ro = new ResizeObserver(() => { const keep = prog; build(); prog = keep; paint(); }); ro.observe(el);
     return () => { cancelAnimationFrame(raf); io.disconnect(); ro.disconnect(); el.removeEventListener("pointerenter", hover); };
-  }, [ini, photo, dark, lines]);
+  }, [photo, dark, flip]);
   return (
     <div className={"tm-ph" + (dark ? " dk" : "")} ref={box} role="img" aria-label={name}>
       <canvas ref={cv} />
@@ -322,7 +325,7 @@ export function Team() {
         <ul className="tm-g">
           {people.map((p) => (
             <li key={p.ini} className="tm-c rv">
-              <PixelPortrait name={p.name} ini={p.ini} n={p.n} dark={p.dark} lines={p.lines} />
+              <PixelPortrait name={p.name} n={p.n} dark={p.dark} flip={p.dark} />
               <h3>{p.name}</h3>
               <p>{p.bio}</p>
             </li>
