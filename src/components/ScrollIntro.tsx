@@ -138,7 +138,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
 
       const rx = r.x + r.w, by = r.y + r.h;
       const v1Rest = mob ? s2.y - 60 : Y(58), v2Rest = mob ? s2.y + s2.h + 14 : Y(728);
-      const OFF = 60;
+      const OFF = 130;
       // V1 / V2: come in along the left and right box edges on scroll 1 and land on the hero's own bars
       let v1y = -OFF, v2y = vh + 10;
       if (first) {
@@ -170,26 +170,32 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         const c1 = s2.y + S(131), c2 = s2.y + S(319), c3 = s2.y + S(388);
         // frame 2 cell lines in the side areas: drawn on scroll 1, taken back on the way to the hero
         segs.push(
-          { h: true, c: c1, f: r.x, t: 0, w: [1.35, 1.7], rv: [2.0, 2.25] },
-          { h: true, c: c2, f: r.x, t: 0, w: [1.45, 1.8], rv: [2.05, 2.3] },
-          { h: false, c: s2.x - S(179), f: c1, t: 0, w: [1.6, 1.95], rv: [2.0, 2.25] },
-          { h: true, c: c3, f: rx, t: vw, w: [1.45, 1.8], rv: [2.05, 2.3] },
-          { h: false, c: s2.x + s2.w + S(195), f: c3, t: vh, w: [1.6, 1.95], rv: [2.1, 2.35] },
+          { h: true, c: c1, f: 0, t: r.x, w: [1.35, 1.7], rv: [2.0, 2.25] },
+          { h: true, c: c2, f: 0, t: r.x, w: [1.45, 1.8], rv: [2.05, 2.3] },
+          { h: false, c: s2.x - S(179), f: 0, t: c1, w: [1.6, 1.95], rv: [2.0, 2.25] },
+          { h: true, c: c3, f: vw, t: rx, w: [1.45, 1.8], rv: [2.05, 2.3] },
+          { h: false, c: s2.x + s2.w + S(195), f: vh, t: c3, w: [1.6, 1.95], rv: [2.1, 2.35] },
         );
       }
       segs.forEach((g, i) => {
         const le = sgL[i], be = sgB[i];
         if (!le || !be) return;
+        // every line starts at a fixed place (the screen edge or the box corner), a bar runs it to the far end and carries on out;
+        // taking a line back works the same way: the bar runs the same direction again and eats the line from its start
         let u = ease(seg(mt, g.w[0], g.w[1]));
-        if (g.rv) u *= 1 - ease(seg(mt, g.rv[0], g.rv[1]));
+        const er = g.rv ? ease(seg(mt, g.rv[0], g.rv[1])) : 0;
         const dir = Math.sign(g.t - g.f) || 1, len = Math.abs(g.t - g.f);
-        const tip = g.f + dir * (len + OFF) * u;
-        const ve = dir > 0 ? Math.min(tip, g.t) : Math.max(tip, g.t), vl = Math.abs(ve - g.f);
+        const at = (q: number) => g.f + dir * (len + OFF) * q;
+        const tip = er > 0 ? at(er) : at(u);
+        const endV = dir > 0 ? Math.min(at(u), g.t) : Math.max(at(u), g.t);
+        const startV = er > 0 ? (dir > 0 ? Math.min(at(er), g.t) : Math.max(at(er), g.t)) : g.f;
+        const vl = Math.abs(endV - startV), ve = endV;
+        u = er >= 0.9995 ? 0 : u;
         const on = u > 0.0005 && vl > 0.5;
         le.style.display = on ? "block" : "none";
         if (on) {
           le.style.width = (g.h ? vl : 1) + "px"; le.style.height = (g.h ? 1 : vl) + "px";
-          le.style.transform = g.h ? `translate(${Math.min(g.f, ve)}px,${g.c}px)` : `translate(${g.c}px,${Math.min(g.f, ve)}px)`;
+          le.style.transform = g.h ? `translate(${Math.min(startV, ve)}px,${g.c}px)` : `translate(${g.c}px,${Math.min(startV, ve)}px)`;
         }
         const BL = 120, tail = tip - dir * BL, shown = u > 0.0005 && dir * (tail - g.t) < 0;
         be.style.display = shown ? "block" : "none";
