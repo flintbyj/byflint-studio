@@ -341,3 +341,5 @@ a{color:#202329}a:hover{color:#000}
 .cur-text .cur-dot,.cur-text .cur-ring{opacity:0}
 @media (hover:none),(pointer:coarse){.cur-dot,.cur-ring{display:none}}
 .cur-ring.has-t span{opacity:1}
+.cur-sp{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:2147482999;pointer-events:none}
+@media (hover:none),(pointer:coarse){.cur-sp{display:none}}
