@@ -53,7 +53,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
     const navA = Array.from(st.querySelectorAll<HTMLElement>(".nav .l a, .nav > a:last-child"));
     const ctaEl = st.querySelector<HTMLElement>(".hero .cta");
     const cardEls = Array.from(st.querySelectorAll<HTMLElement>(".work .card"));
-    const bV1 = q(".sx-v1"), bV2 = q(".sx-v2"), nvEl = st.querySelector<HTMLElement>(".nav");
+    const bV1 = q(".sx-v1"), bV2 = q(".sx-v2");
     let cur = 0, raf = 0, ld = 1, lraf = 0;
     // lines are time-based, not scrubbed: scrolling past a mark makes a bar run its whole line by itself, so nothing hangs mid-screen
     const dS: number[] = [], eS: number[] = [];
@@ -159,8 +159,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
       const mt = ld < 1 ? ld : p < 0.5 ? 1 + seg(p, 0, 0.45) : 2 + seg(p, 0.5, 0.9);
       type Sg = { h: boolean; c: number; f: number; t: number; w: number[]; rv?: number[]; sc?: boolean };
       const S = (v: number) => v * k;
-      const hy = s3.y, hb = s3.y + s3.h, up = first ? 0 : lerp(0, hy, c); // up: where upward lines stop (the nav bottom in the hero, so nothing crosses the header)
-      nvEl?.style.setProperty("--cv", ((first ? 0 : c) * (nvEl?.offsetHeight ?? 72)) + "px"); // the header comes down over the lines above the hero
+      const hy = s3.y, hb = s3.y + s3.h; 
       const segs: Sg[] = [
         // pinwheel arms, drawn by the loader (each leaves a different corner, along the whole box edge and out to the screen edge)
         { h: false, c: r.x - 1, f: by, t: 0, w: [0, 0.6] },

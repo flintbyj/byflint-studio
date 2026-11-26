@@ -189,7 +189,6 @@ a{color:#202329}a:hover{color:#000}
 .sx-on .sx-ln{display:block;position:absolute;left:0;top:0;width:100%;height:100vh;overflow:hidden;pointer-events:none;z-index:20}
 .sx-done .sx-ln{visibility:hidden}
 .sx-on:not(.sx-done) .nav{background:transparent}
-.nav::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--cv,0px);background:var(--bg);z-index:-1}
 .sx-sg{position:absolute;left:0;top:0;background:var(--line);display:none}
 .sx-sb{position:absolute;left:0;top:0;border-radius:2px;background:var(--ink);z-index:3;display:none}
 .sx-box{position:absolute;left:0;top:0;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(20px,3.3vw,42px);background:var(--ink);will-change:transform,width,height}
