@@ -175,13 +175,14 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         // one grid for the whole intro. It is drawn once in the opening view (a bar runs each line in) and never taken back:
         // every scroll only re-fits the same lines to the new cell sizes (frame 1 -> frame 2 -> the hero).
         const m = (v1: number, v2: number, v3: number) => (first ? lerp(v1, v2, a) : lerp(v2, v3, c));
-        const hx = s3.x, hy = s3.y, hw = s3.w;
+        const hy = s3.y;
+        // in the hero the left and right cells are only a sliver wide, so the two vertical cell lines slide out of the screen
         segs.push(
-          { h: false, c: m(X(148), X(200), hx + 99), f: 0, t: m(Y(285), Y(285), hy + 182), w: [0.15, 0.7] },
-          { h: true, c: m(Y(285), Y(285), hy + 182), f: 0, t: r.x, w: [0.2, 0.75] },
-          { h: true, c: m(Y(517), Y(472), hy + 364), f: 0, t: r.x, w: [0.25, 0.8] },
-          { h: true, c: m(Y(540), Y(540), hy + 430), f: vw, t: rx, w: [0.3, 0.85] },
-          { h: false, c: m(X(1123), X(1093), hx + hw - 82), f: vh, t: m(Y(540), Y(540), hy + 430), w: [0.35, 0.9] },
+          { h: false, c: m(X(148), X(200), -14), f: 0, t: m(Y(285), Y(285), hy + 173), w: [0.15, 0.7] },
+          { h: true, c: m(Y(285), Y(285), hy + 173), f: 0, t: r.x, w: [0.2, 0.75] },
+          { h: true, c: m(Y(517), Y(472), hy + 354), f: 0, t: r.x, w: [0.25, 0.8] },
+          { h: true, c: m(Y(540), Y(540), hy + 420), f: vw, t: rx, w: [0.3, 0.85] },
+          { h: false, c: m(X(1123), X(1093), vw + 14), f: vh, t: m(Y(540), Y(540), hy + 420), w: [0.35, 0.9] },
         );
       }
       const nowT = performance.now(), dts = Math.min(0.064, (nowT - lt) / 1000); lt = nowT; anim = false;
