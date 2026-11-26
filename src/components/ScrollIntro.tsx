@@ -58,7 +58,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
     // lines are time-based, not scrubbed: scrolling past a mark makes a bar run its whole line by itself, so nothing hangs mid-screen
     const dS: number[] = [], eS: number[] = [];
     let lt = performance.now(), anim = false;
-    const LDUR = 1.1;
+    const LDUR = 2.0;
     const toward = (v: number, want: number, dt: number) => (v < want ? Math.min(want, v + dt) : Math.max(want, v - dt));
     const root = document.documentElement;
     const clampN = (v: number) => Math.min(100, Math.max(0, v));
