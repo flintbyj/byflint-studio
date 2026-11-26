@@ -197,6 +197,8 @@ a{color:#202329}a:hover{color:#000}
 .sx-on:not(.sx-done) .nav .logo{visibility:hidden}
 .sx-txt{position:absolute;left:0;top:0;margin:0;z-index:41;display:none;font-weight:600;line-height:1.2;letter-spacing:-.01em;pointer-events:none}
 .sx-on .sx-txt{display:block}.sx-done .sx-txt{visibility:hidden}
+.sx-st{position:absolute;left:0;top:0;margin:0;z-index:41;display:none;font-weight:600;line-height:1.3;letter-spacing:-.01em;color:#FBFAF9;pointer-events:none}
+.sx-on .sx-st{display:block}.sx-done .sx-st{visibility:hidden}
 .sx-txt span{color:var(--sxs,#999B93)}
 .sx-on:not(.sx-done) .hero h1{visibility:hidden}
 .sx-bar{position:absolute;left:0;top:0;background:var(--ink);z-index:3;will-change:transform}

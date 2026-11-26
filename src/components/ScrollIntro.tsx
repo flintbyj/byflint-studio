@@ -41,9 +41,10 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
   const box = useRef<HTMLDivElement>(null);
   const logo = useRef<HTMLSpanElement>(null);
   const txtR = useRef<HTMLHeadingElement>(null);
+  const stR = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
-    const w = wrap.current!, st = stage.current!, b = box.current!, lg = logo.current!, tx = txtR.current!;
+    const w = wrap.current!, st = stage.current!, b = box.current!, lg = logo.current!, tx = txtR.current!, sm = stR.current!;
     const lf = lg.querySelector<SVGGElement>(".sx-lf")!, lo = lg.querySelector<SVGGElement>(".sx-lo")!;
     const los = Array.from(lo.children) as SVGElement[];
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { w.classList.add("sx-off"); return; }
@@ -123,6 +124,16 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         };
         paint(tx, INK, BG);
         if (sp) paint(sp, MUT, GREY);
+      }
+
+      { // the opening statement, inside the dark box under the mark: it writes in with the headline and wipes away as the box starts to shrink
+        const rvl = ld < 1 ? ease(seg(ld, 0.84, 1)) : 1, gone = first ? ease(seg(a, 0, 0.2)) : 1;
+        sm.style.fontSize = (mob ? 20 : 26 * k) + "px";
+        sm.style.width = (r.w - 2 * pad) * (mob ? 1 : 0.78) + "px";
+        sm.style.left = r.x + pad + "px";
+        sm.style.top = r.y + (mob ? 104 : 132 * k) + "px";
+        sm.style.clipPath = gone > 0 ? `inset(${clampN(gone * 100)}% 0 0 0)` : `inset(0 0 ${clampN((1 - rvl) * 100)}% 0)`;
+        sm.style.visibility = gone >= 1 ? "hidden" : "";
       }
 
       const cs = Math.min(131 * (mob ? 0.6 : k), s2.h * 0.3); // logo cell size, used only to centre the mark
@@ -315,6 +326,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
           {Array.from({ length: 24 }, (_, i) => <span key={"b" + i} className="sx-sb" />)}
           <span className="sx-bar sx-bv sx-v1" /><span className="sx-bar sx-bv sx-v2" />
         </div>
+        <p className="sx-st" ref={stR} aria-hidden="true">At Flint, websites and products are built for growth and conversion.</p>
         <h1 className="sx-txt" ref={txtR} aria-hidden="true">Design Bandwidth<br />for startups and scale-ups.<br /><span>Shipped in code.</span></h1>
         <span className="sx-logo" ref={logo} aria-hidden="true">
           <svg width={MW} height={MH} viewBox="0 0 168 204" style={{ overflow: "visible" }}>
