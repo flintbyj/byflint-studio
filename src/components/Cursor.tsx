@@ -1,110 +1,50 @@
 "use client";
 import { useEffect, useRef } from "react";
 
-/* The cursor is a small fan of thin lines, a spark drawn the way the mark is. It throws a few short lines behind as it moves,
-   grows over anything clickable and throws a short burst of rays on click. It inverts against whatever is under it,
-   so it reads on light and dark. Fine pointers only. */
-const ln = (g: CanvasRenderingContext2D, x: number, y: number, a: number, from: number, to: number) => {
-  g.beginPath(); g.moveTo(x + Math.cos(a) * from, y + Math.sin(a) * from); g.lineTo(x + Math.cos(a) * to, y + Math.sin(a) * to); g.stroke();
-};
-// the spark is made of lines, like the mark: a small fan of thin rounded strokes of different lengths
-const FAN = [-1.92, -1.31, -0.7, -0.09], FLEN = [6, 10, 7, 4];
-
+/* A dot with a thin ring around it, and one hairline running across the page in each direction through the dot, like a crosshair.
+   The ring trails the dot a little and opens over anything clickable. Everything inverts against what is under it, so it reads on light and dark.
+   Fine pointers only. */
 export function Cursor() {
-  const dot = useRef<HTMLCanvasElement>(null);
-  const st = useRef<HTMLCanvasElement>(null);
-  const cv = useRef<HTMLCanvasElement>(null);
+  const dot = useRef<HTMLDivElement>(null);
+  const ring = useRef<HTMLDivElement>(null);
+  const lh = useRef<HTMLDivElement>(null);
+  const lv = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const root = document.documentElement, d = dot.current!, s = st.current!, c = cv.current!;
-    const dg = d.getContext("2d")!, sg = s.getContext("2d")!, g = c.getContext("2d")!;
-    const DOT = 40; // canvas box for the cursor glint
-    let dpr = 1, x = -100, y = -100, cx = x, cy = y, shown = false, hot = false, down = false, scale = 1, rot = 0, spin = 0;
-    // trail glints (inverting) and click rays (coloured)
-    type G = { x: number; y: number; vx: number; vy: number; r: number; rot: number; vr: number; life: number; max: number };
-    type P = { x: number; y: number; vx: number; vy: number; life: number; max: number; len: number; kind: number; rot: number; vr: number };
-    const gs: G[] = [], ps: P[] = []; let last = 0, raf = 0, acc = 0, lx = -1, ly = -1;
-    const fit = () => {
-      dpr = Math.min(2, window.devicePixelRatio || 1);
-      s.width = c.width = Math.round(innerWidth * dpr); s.height = c.height = Math.round(innerHeight * dpr);
-      d.width = d.height = Math.round(DOT * dpr);
+    const root = document.documentElement, d = dot.current!, r = ring.current!, h = lh.current!, v = lv.current!;
+    let x = -100, y = -100, rx = x, ry = y, raf = 0, shown = false, hot = false, down = false;
+    const apply = () => {
+      d.style.transform = `translate3d(${x}px,${y}px,0) translate(-50%,-50%) scale(${hot ? 0.6 : 1})`;
+      r.style.transform = `translate3d(${rx}px,${ry}px,0) translate(-50%,-50%) scale(${down ? 0.8 : hot ? 1.6 : 1})`;
+      h.style.transform = `translate3d(0,${y}px,0)`; v.style.transform = `translate3d(${x}px,0,0)`;
     };
-    fit();
-    const run = () => { if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } };
-    const frame = (now: number) => {
-      const dt = Math.min(48, now - last); last = now; const k = dt / 16;
-      // the cursor glint follows exactly; its size and turn ease toward the hover state
-      cx += (x - cx) * (reduce ? 1 : 0.5); cy += (y - cy) * (reduce ? 1 : 0.5);
-      const ts = down ? 0.7 : hot ? 1.25 : 1; scale += (ts - scale) * 0.18; spin += ((hot ? 0.35 : 0) - spin) * 0.14; rot = spin;
-      dg.clearRect(0, 0, d.width, d.height); dg.strokeStyle = "#fff"; dg.lineCap = "round"; dg.lineWidth = 1.5 * dpr;
-      FAN.forEach((a, i) => ln(dg, d.width / 2, d.height / 2, a + rot, 3.2 * scale * dpr, (3.2 + FLEN[i] * (hot ? 1.5 : 1)) * scale * dpr));
-      dg.beginPath(); dg.arc(d.width / 2, d.height / 2, 1.1 * dpr, 0, Math.PI * 2); dg.fillStyle = "#fff"; dg.fill();
-      d.style.transform = `translate3d(${cx - DOT / 2}px,${cy - DOT / 2}px,0)`;
-      // trail glints
-      sg.clearRect(0, 0, s.width, s.height); sg.strokeStyle = "#fff"; sg.lineCap = "round"; sg.lineWidth = 1.3 * dpr;
-      for (let i = gs.length - 1; i >= 0; i--) {
-        const p = gs[i]; p.life += dt; if (p.life >= p.max) { gs.splice(i, 1); continue; }
-        const t = p.life / p.max; p.x += p.vx * k; p.y += p.vy * k; p.rot += p.vr * k;
-        sg.globalAlpha = Math.pow(1 - t, 1.1);
-        for (let q = -1; q <= 1; q++) { const a = p.rot + q * 0.55, o = 2 + t * 7, L = p.r * (q === 0 ? 1 : 0.65) * (1 - t * 0.5); ln(sg, p.x * dpr, p.y * dpr, a, o * dpr, (o + L) * dpr); }
-      }
-      sg.globalAlpha = 1;
-      // click rays
-      g.clearRect(0, 0, c.width, c.height);
-      for (let i = ps.length - 1; i >= 0; i--) {
-        const p = ps[i]; p.life += dt; if (p.life >= p.max) { ps.splice(i, 1); continue; }
-        const t = p.life / p.max, al = Math.pow(1 - t, 0.9), sp = Math.hypot(p.vx, p.vy) || 1;
-        p.vy += 0.02 * k;
-        const L = p.len * (1 - t * 0.6), x1 = p.x, y1 = p.y, x2 = p.x - (p.vx / sp) * L, y2 = p.y - (p.vy / sp) * L;
-        const w = p.kind === 2 ? 1.4 : 2.6, dx = x2 - x1, dy = y2 - y1, dd = Math.hypot(dx, dy) || 1, nx = (-dy / dd) * w / 2, ny = (dx / dd) * w / 2;
-        g.globalAlpha = al * 0.4; g.fillStyle = "#202329";
-        g.beginPath(); g.moveTo((x1 + nx * 1.9) * dpr, (y1 + ny * 1.9) * dpr); g.lineTo(x2 * dpr, y2 * dpr); g.lineTo((x1 - nx * 1.9) * dpr, (y1 - ny * 1.9) * dpr); g.closePath(); g.fill();
-        const gr = g.createLinearGradient(x1 * dpr, y1 * dpr, x2 * dpr, y2 * dpr); gr.addColorStop(0, t < 0.3 ? "#FFFFFF" : "#FFF1A6"); gr.addColorStop(1, "#F1FF63");
-        g.globalAlpha = al; g.fillStyle = gr;
-        g.beginPath(); g.moveTo((x1 + nx) * dpr, (y1 + ny) * dpr); g.lineTo(x2 * dpr, y2 * dpr); g.lineTo((x1 - nx) * dpr, (y1 - ny) * dpr); g.closePath(); g.fill();
-        p.x += p.vx * k; p.y += p.vy * k; p.vx *= Math.pow(0.9, k); p.vy *= Math.pow(0.9, k);
-      }
-      g.globalAlpha = 1;
-      const moving = Math.abs(x - cx) + Math.abs(y - cy) > 0.2 || Math.abs(ts - scale) > 0.01 || Math.abs((hot ? 0.35 : 0) - spin) > 0.01;
-      raf = gs.length || ps.length || moving ? requestAnimationFrame(frame) : 0;
+    const tick = () => {
+      rx += (x - rx) * (reduce ? 1 : 0.18); ry += (y - ry) * (reduce ? 1 : 0.18);
+      apply(); raf = Math.abs(x - rx) + Math.abs(y - ry) > 0.1 ? requestAnimationFrame(tick) : 0;
     };
-    const strike = (px: number, py: number) => {
-      if (reduce || root.classList.contains("cur-text")) return;
-      for (let i = 0; i < 18 && ps.length < 120; i++) {
-        const a = (i / 18) * Math.PI * 2 + (Math.random() - 0.5) * 0.5, v = 2.2 + Math.random() * 5.2, r = Math.random();
-        ps.push({ x: px, y: py, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, max: 320 + Math.random() * 380, len: 12 + Math.random() * 22, kind: r < 0.3 ? 2 : 0, rot: 0, vr: 0 });
-      }
-      run();
-    };
-    const drop = (px: number, py: number, dx: number, dy: number) => {
-      if (reduce || gs.length > 22) return;
-      gs.push({ x: px + (Math.random() - 0.5) * 6, y: py + (Math.random() - 0.5) * 6, vx: (Math.random() - 0.5) * 0.5, vy: 0.1 + Math.random() * 0.25, r: 4 + Math.random() * 6, rot: Math.atan2(-dy, -dx) + (Math.random() - 0.5) * 1.6, vr: 0, life: 0, max: 650 + Math.random() * 450 });
-    };
-    const show = (v: boolean) => { if (v !== shown) { shown = v; root.classList.toggle("cur-on", v); } };
+    const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
+    const show = (on: boolean) => { if (on !== shown) { shown = on; root.classList.toggle("cur-on", on); } };
     const move = (e: PointerEvent) => {
-      x = e.clientX; y = e.clientY;
-      if (!shown) { cx = x; cy = y; show(true); lx = x; ly = y; }
-      const mx = x - lx, my = y - ly; acc += Math.hypot(mx, my); lx = x; ly = y;
-      if (acc > 46) { acc = 0; drop(x, y, mx || 1, my); }
+      x = e.clientX; y = e.clientY; if (!shown) { rx = x; ry = y; show(true); }
       const t = e.target as Element | null;
       hot = !!t?.closest("a,button,summary,label,[role=button],[data-cursor]");
       root.classList.toggle("cur-text", !!t?.closest("input,textarea,select,[contenteditable=true]"));
-      run();
+      apply(); kick();
     };
-    const dn = (e: PointerEvent) => { strike(e.clientX, e.clientY); down = true; run(); };
-    const up = () => { down = false; run(); };
+    const dn = () => { down = true; kick(); }, up = () => { down = false; kick(); };
     const out = (e: MouseEvent) => { if (!e.relatedTarget) show(false); };
-    window.addEventListener("pointermove", move, { passive: true }); window.addEventListener("resize", fit);
+    window.addEventListener("pointermove", move, { passive: true });
     window.addEventListener("pointerdown", dn); window.addEventListener("pointerup", up);
     document.addEventListener("mouseout", out);
-    return () => { cancelAnimationFrame(raf); root.classList.remove("cur-on", "cur-text"); window.removeEventListener("pointermove", move); window.removeEventListener("resize", fit); window.removeEventListener("pointerdown", dn); window.removeEventListener("pointerup", up); document.removeEventListener("mouseout", out); };
+    return () => { cancelAnimationFrame(raf); root.classList.remove("cur-on", "cur-text"); window.removeEventListener("pointermove", move); window.removeEventListener("pointerdown", dn); window.removeEventListener("pointerup", up); document.removeEventListener("mouseout", out); };
   }, []);
   return (
     <>
-      <canvas className="cur-sp cur-st" ref={st} aria-hidden="true" />
-      <canvas className="cur-sp" ref={cv} aria-hidden="true" />
-      <canvas className="cur-dot" ref={dot} aria-hidden="true" />
+      <div className="cur-l cur-h" ref={lh} aria-hidden="true" />
+      <div className="cur-l cur-v" ref={lv} aria-hidden="true" />
+      <div className="cur-ring" ref={ring} aria-hidden="true" />
+      <div className="cur-dot" ref={dot} aria-hidden="true" />
     </>
   );
 }
