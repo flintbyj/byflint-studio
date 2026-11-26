@@ -60,7 +60,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
     // lines are time-based, not scrubbed: scrolling past a mark makes a bar run its whole line by itself, so nothing hangs mid-screen
     const dS: number[] = [], eS: number[] = [];
     let lt = performance.now(), anim = false;
-    const LDUR = 2.0;
+    const LDUR = 1.1;
     const toward = (v: number, want: number, dt: number) => (v < want ? Math.min(want, v + dt) : Math.max(want, v - dt));
     const root = document.documentElement;
     const clampN = (v: number) => Math.min(100, Math.max(0, v));
@@ -185,12 +185,12 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
       const segs: Sg[] = [
         // pinwheel arms, drawn by the loader (each leaves a different corner, along the whole box edge and out to the screen edge)
         { h: false, c: r.x - 1, f: by, t: lerp(0, r.y - 1, ret), w: [0, 0.6] },
-        { h: true, c: r.y - 1, f: r.x, t: vw, w: [0.05, 0.65] },
-        { h: false, c: rx, f: r.y, t: vh, w: [0.02, 0.62] },
-        { h: true, c: by - 1, f: rx, t: 0, w: [0.07, 0.67] },
+        { h: true, c: r.y - 1, f: r.x, t: vw, w: [0.19, 0.65] },
+        { h: false, c: rx, f: r.y, t: vh, w: [0, 0.62] },
+        { h: true, c: by - 1, f: rx, t: 0, w: [0.19, 0.67] },
         // the other halves of the box-edge lines: drawn with the rest in the opening, so the lines are complete from the first view and later only move
-        { h: false, c: r.x - 1, f: by, t: vh, w: [0.1, 0.6] },
-        { h: true, c: by - 1, f: rx, t: vw, w: [0.12, 0.62] },
+        { h: false, c: r.x - 1, f: by, t: vh, w: [0.38, 0.6] },
+        { h: true, c: by - 1, f: rx, t: vw, w: [0.38, 0.62] },
       ];
       if (!mob) {
         // one grid for the whole intro. It is drawn once in the opening view (a bar runs each line in) and never taken back:
@@ -201,11 +201,11 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         // right cell becomes the right column (its right edge is the screen edge), so each line ends up on a line the page already has.
         const hx = s3.x;
         segs.push(
-          { h: false, c: m(X(148), X(200), hx - 1), f: lerp(0, m(Y(285), Y(285), hy), ret), t: m(Y(285), Y(285), hy), w: [0.15, 0.7] },
-          { h: true, c: m(Y(285), Y(285), hy), f: 0, t: r.x, w: [0.2, 0.75] },
-          { h: true, c: m(Y(517), Y(472), hb), f: 0, t: r.x, w: [0.25, 0.8] },
-          { h: true, c: m(Y(540), Y(540), hy), f: vw, t: rx, w: [0.3, 0.85] },
-          { h: false, c: m(X(1123), X(1093), vw), f: vh, t: m(Y(540), Y(540), hy), w: [0.35, 0.9] },
+          { h: false, c: m(X(148), X(200), hx - 1), f: lerp(0, m(Y(285), Y(285), hy), ret), t: m(Y(285), Y(285), hy), w: [0.57, 0.7] },
+          { h: true, c: m(Y(285), Y(285), hy), f: 0, t: r.x, w: [0.57, 0.75] },
+          { h: true, c: m(Y(517), Y(472), hb), f: 0, t: r.x, w: [0.76, 0.8] },
+          { h: true, c: m(Y(540), Y(540), hy), f: vw, t: rx, w: [0.76, 0.85] },
+          { h: false, c: m(X(1123), X(1093), vw), f: vh, t: m(Y(540), Y(540), hy), w: [0.95, 0.9] },
         );
       }
       const nowT = performance.now(), dts = Math.min(0.064, (nowT - lt) / 1000); lt = nowT; anim = false;
