@@ -59,13 +59,13 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
     // lines are time-based, not scrubbed: scrolling past a mark makes a bar run its whole line by itself, so nothing hangs mid-screen
     const dS: number[] = [], eS: number[] = [];
     let lt = performance.now(), anim = false;
-    const LDUR = 1.1;
+    const LDUR = 1.5;
     const toward = (v: number, want: number, dt: number) => (v < want ? Math.min(want, v + dt) : Math.max(want, v - dt));
     const root = document.documentElement;
     const clampN = (v: number) => Math.min(100, Math.max(0, v));
 
     const target = () => {
-      const len = window.innerHeight * 1.2;
+      const len = window.innerHeight * 1.7;
       w.style.setProperty("--sxlen", len + "px");
       return Math.min(1, Math.max(0, -w.getBoundingClientRect().top / len));
     };
@@ -294,7 +294,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
 
     const tick = () => {
       const t = target();
-      cur += (t - cur) * 0.12;
+      cur += (t - cur) * 0.075;
       if (Math.abs(t - cur) < 0.0008) cur = t;
       draw(cur);
       raf = cur === t && !anim ? 0 : requestAnimationFrame(tick);
@@ -304,7 +304,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
     if (window.scrollY < 8) {
       ld = 0;
       root.style.overflow = "hidden";
-      const t0 = performance.now(), D = 2900;
+      const t0 = performance.now(), D = 3800;
       const run = (now: number) => {
         ld = Math.min(1, (now - t0) / D);
         draw(cur);
