@@ -2,6 +2,20 @@
 import { useEffect, useRef } from "react";
 import { Mark } from "./Mark";
 
+function Shapes({ outline }: { outline?: boolean }) {
+  const o = outline ? ({ pathLength: 1, strokeDasharray: 1, strokeDashoffset: 1 } as const) : {};
+  return (
+    <>
+      <rect x="64.0972" width="16.335" height="50.4254" rx="8.1675" {...o} />
+      <rect x="0" y="64.2747" width="50.4254" height="16.335" rx="8.1675" {...o} />
+      <rect x="94.4589" y="64.2747" width="73.1524" height="16.335" rx="8.1675" {...o} />
+      <rect x="64.0972" y="94.459" width="16.335" height="109.373" rx="8.1675" {...o} />
+      <circle cx="72.2647" cy="72.4422" r="8.1675" {...o} />
+      <rect x="147.022" y="135.639" width="16.335" height="50.7086" rx="8.1675" transform="rotate(135 147.022 135.639)" {...o} />
+    </>
+  );
+}
+
 type R = { x: number; y: number; w: number; h: number };
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const lr = (a: R, b: R, t: number): R => ({ x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t), w: lerp(a.w, b.w, t), h: lerp(a.h, b.h, t) });
@@ -30,6 +44,8 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const w = wrap.current!, st = stage.current!, b = box.current!, lg = logo.current!, tx = txtR.current!;
+    const lf = lg.querySelector<SVGGElement>(".sx-lf")!, lo = lg.querySelector<SVGGElement>(".sx-lo")!;
+    const los = Array.from(lo.children) as SVGElement[];
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { w.classList.add("sx-off"); return; }
     w.classList.add("sx-on");
     const q = (s: string) => st.querySelector(s) as HTMLElement;
@@ -162,12 +178,13 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
           le.style.width = (g.h ? vl : 1) + "px"; le.style.height = (g.h ? 1 : vl) + "px";
           le.style.transform = g.h ? `translate(${Math.min(g.f, ve)}px,${g.c}px)` : `translate(${g.c}px,${Math.min(g.f, ve)}px)`;
         }
-        const tail = tip - dir * 46, shown = u > 0.0005 && dir * (tail - g.t) < 0;
+        const BL = 120, tail = tip - dir * BL, shown = u > 0.0005 && dir * (tail - g.t) < 0;
         be.style.display = shown ? "block" : "none";
         if (shown) {
-          be.style.width = (g.h ? 46 : 6) + "px"; be.style.height = (g.h ? 6 : 46) + "px";
+          be.style.width = (g.h ? BL : 3) + "px"; be.style.height = (g.h ? 3 : BL) + "px";
+          be.style.background = `linear-gradient(${g.h ? (dir > 0 ? "90deg" : "270deg") : (dir > 0 ? "180deg" : "0deg")}, rgba(83,98,122,0), #53627A 70%, #202329)`;
           const lo = Math.min(tip, tail);
-          be.style.transform = g.h ? `translate(${lo}px,${g.c - 2.5}px)` : `translate(${g.c - 2.5}px,${lo}px)`;
+          be.style.transform = g.h ? `translate(${lo}px,${g.c - 1}px)` : `translate(${g.c - 1}px,${lo}px)`;
         }
       });
 
@@ -176,11 +193,18 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         const rv = ease(seg(ld, 0.58, 0.88)), tf = ease(seg(ld, 0.82, 1));
         b.style.clipPath = `inset(${clampN((1 - rv) * 100)}% 0 0 0)`;
         tx.style.opacity = String(tf);
-        lg.style.opacity = String(tf);
+        // Dropbox-style formation: outline strokes draw in over the lines, then the fill comes in
+        const dr = ease(seg(ld, 0.62, 0.9)), fl = ease(seg(ld, 0.86, 1));
+        lg.style.opacity = "1";
+        lf.style.opacity = String(fl);
+        lo.style.opacity = String(1 - fl);
+        los.forEach((e, i) => { const d = ease(seg(dr, i * 0.07, 0.55 + i * 0.07)); e.style.strokeDashoffset = String(1 - d); });
       } else {
         b.style.clipPath = "";
         tx.style.opacity = "1";
         lg.style.opacity = "1";
+        lf.style.opacity = "1";
+        lo.style.opacity = "0";
       }
 
       // the rest of the first screen builds in while the box lands: nav links drop in, the button and the cards
@@ -246,7 +270,12 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
           <span className="sx-bar sx-bv sx-v1" /><span className="sx-bar sx-bv sx-v2" />
         </div>
         <h1 className="sx-txt" ref={txtR} aria-hidden="true">Design Bandwidth<br />for startups and scale-ups.<br /><span>Shipped in code.</span></h1>
-        <span className="sx-logo" ref={logo} aria-hidden="true"><Mark width={MW} height={MH} /></span>
+        <span className="sx-logo" ref={logo} aria-hidden="true">
+          <svg width={MW} height={MH} viewBox="0 0 168 204" style={{ overflow: "visible" }}>
+            <g className="sx-lf" fill="currentColor"><Shapes /></g>
+            <g className="sx-lo" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinejoin="round"><Shapes outline /></g>
+          </svg>
+        </span>
       </div>
       <div className="sx-sp" aria-hidden="true" />
     </div>
