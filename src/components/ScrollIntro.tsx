@@ -172,26 +172,23 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         { h: true, c: by, f: rx, t: vw, w: [2.35, 2.85] },
       ];
       if (!mob) {
-        // exact cell borders from the Figma frames (1280x832). Each line starts at a screen edge, a bar runs it, and a bar takes it back.
-        // frame 1 (the opening state): left cell and the cells under the box
+        // cell borders read off the design frames (1280x832). Every line starts at a screen edge, a bar runs it, and a bar takes it back.
+        // frame 1: left cell, and the cells right of the box
         segs.push(
-          { h: true, c: Y(287), f: 0, t: X(149.5), w: [0.15, 0.7], rv: [1.2, 1.5] },
-          { h: true, c: Y(574), f: 0, t: X(149.5), w: [0.2, 0.75], rv: [1.22, 1.52] },
-          { h: false, c: X(149.5), f: Y(287), t: Y(574), w: [0.3, 0.85], rv: [1.26, 1.56] },
-          { h: false, c: X(233.5), f: vh, t: by, w: [0.25, 0.8], rv: [1.24, 1.54] },
-          { h: false, c: X(532.5), f: vh, t: by, w: [0.3, 0.85], rv: [1.28, 1.58] },
+          { h: false, c: X(148), f: 0, t: Y(285), w: [0.15, 0.7], rv: [1.2, 1.5] },
+          { h: true, c: Y(285), f: 0, t: r.x, w: [0.2, 0.75], rv: [1.22, 1.52] },
+          { h: true, c: Y(517), f: 0, t: r.x, w: [0.25, 0.8], rv: [1.24, 1.54] },
+          { h: true, c: Y(540), f: vw, t: rx, w: [0.3, 0.85], rv: [1.26, 1.56] },
+          { h: false, c: X(1123), f: vh, t: Y(540), w: [0.35, 0.9], rv: [1.28, 1.58] },
         );
-        // frame 2 (after the first scroll): cells around the block
+        // frame 2: cells left of the block and right of it
         segs.push(
-          { h: true, c: Y(287), f: 0, t: X(202), w: [1.3, 1.7], rv: [2.0, 2.25] },
-          { h: true, c: Y(574), f: 0, t: X(202), w: [1.34, 1.74], rv: [2.02, 2.27] },
-          { h: false, c: X(202), f: Y(287), t: Y(574), w: [1.4, 1.8], rv: [2.04, 2.29] },
-          { h: true, c: Y(676), f: 0, t: r.x, w: [1.36, 1.76], rv: [2.06, 2.31] },
-          { h: false, c: X(380), f: vh, t: Y(676), w: [1.42, 1.82], rv: [2.08, 2.33] },
-          { h: false, c: X(380), f: 0, t: Y(156), w: [1.3, 1.7], rv: [2.1, 2.35] },
-          { h: true, c: Y(357), f: vw, t: rx, w: [1.34, 1.74], rv: [2.02, 2.27] },
-          { h: true, c: Y(545), f: vw, t: rx, w: [1.38, 1.78], rv: [2.06, 2.31] },
-          { h: false, c: X(1102), f: vh, t: Y(545), w: [1.44, 1.84], rv: [2.1, 2.35] },
+          { h: false, c: X(200), f: 0, t: Y(285), w: [1.3, 1.7], rv: [2.0, 2.25] },
+          { h: true, c: Y(285), f: 0, t: r.x, w: [1.34, 1.74], rv: [2.02, 2.27] },
+          { h: true, c: Y(472), f: 0, t: r.x, w: [1.38, 1.78], rv: [2.04, 2.29] },
+          { h: true, c: Y(670), f: 0, t: r.x, w: [1.42, 1.82], rv: [2.06, 2.31] },
+          { h: true, c: Y(540), f: vw, t: rx, w: [1.36, 1.76], rv: [2.08, 2.33] },
+          { h: false, c: X(1093), f: vh, t: Y(540), w: [1.44, 1.84], rv: [2.1, 2.35] },
         );
       }
       const nowT = performance.now(), dts = Math.min(0.064, (nowT - lt) / 1000); lt = nowT; anim = false;
