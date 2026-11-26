@@ -18,7 +18,7 @@ a{color:#202329}a:hover{color:#000}
 .h2{font-size:clamp(28px,3.3vw,42px);line-height:1.2;letter-spacing:-.01em;font-weight:600}
 .h2 span{color:var(--mut)}
 .ix{font-size:16px;color:var(--mut);font-variant-numeric:tabular-nums}
-.nav{display:flex;align-items:center;justify-content:space-between;height:72px;padding:0 4.7%;border-bottom:1px solid var(--line);position:relative;background:var(--bg)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:72px;padding:0 4.7%;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30;background:var(--bg)}
 .nav a{text-decoration:none;font-size:18px;font-weight:500}
 .nav .l{display:flex;gap:30px}
 .nav .logo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#53627A;display:flex}

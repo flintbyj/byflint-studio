@@ -159,30 +159,31 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
       const mt = ld < 1 ? ld : p < 0.5 ? 1 + seg(p, 0, 0.45) : 2 + seg(p, 0.5, 0.9);
       type Sg = { h: boolean; c: number; f: number; t: number; w: number[]; rv?: number[]; sc?: boolean };
       const S = (v: number) => v * k;
+      const hy = s3.y, hb = s3.y + s3.h, up = first ? 0 : lerp(0, hy, c); // up: where upward lines stop (the nav bottom in the hero, so nothing crosses the header)
       const segs: Sg[] = [
         // pinwheel arms, drawn by the loader (each leaves a different corner, along the whole box edge and out to the screen edge)
-        { h: false, c: r.x - 1, f: by, t: 0, w: [0, 0.6] },
+        { h: false, c: r.x - 1, f: by, t: up, w: [0, 0.6] },
         { h: true, c: r.y - 1, f: r.x, t: vw, w: [0.05, 0.65] },
         { h: false, c: rx, f: r.y, t: vh, w: [0.02, 0.62] },
         { h: true, c: by, f: rx, t: 0, w: [0.07, 0.67] },
         // growth into the full page lines while the box becomes the hero
         { h: false, c: r.x - 1, f: by, t: vh, w: [2.3, 2.8], sc: true },
         { h: true, c: r.y - 1, f: r.x, t: 0, w: [2.3, 2.8], sc: true },
-        { h: false, c: rx, f: r.y, t: 0, w: [2.35, 2.85], sc: true },
+        { h: false, c: rx, f: r.y, t: up, w: [2.35, 2.85], sc: true },
         { h: true, c: by, f: rx, t: vw, w: [2.35, 2.85], sc: true },
       ];
       if (!mob) {
         // one grid for the whole intro. It is drawn once in the opening view (a bar runs each line in) and never taken back:
         // every scroll only re-fits the same lines to the new cell sizes (frame 1 -> frame 2 -> the hero).
         const m = (v1: number, v2: number, v3: number) => (first ? lerp(v1, v2, a) : lerp(v2, v3, c));
-        const hy = s3.y;
-        // in the hero the left and right cells are only a sliver wide, so the two vertical cell lines slide out of the screen
+        // in the hero the side cells are only slivers: the vertical cell lines slide out of the screen and the horizontal ones
+        // glide onto the page's own lines (nav bottom, hero bottom), so the finished hero has no extra lines left over
         segs.push(
-          { h: false, c: m(X(148), X(200), -14), f: 0, t: m(Y(285), Y(285), hy + 173), w: [0.15, 0.7] },
-          { h: true, c: m(Y(285), Y(285), hy + 173), f: 0, t: r.x, w: [0.2, 0.75] },
-          { h: true, c: m(Y(517), Y(472), hy + 354), f: 0, t: r.x, w: [0.25, 0.8] },
-          { h: true, c: m(Y(540), Y(540), hy + 420), f: vw, t: rx, w: [0.3, 0.85] },
-          { h: false, c: m(X(1123), X(1093), vw + 14), f: vh, t: m(Y(540), Y(540), hy + 420), w: [0.35, 0.9] },
+          { h: false, c: m(X(148), X(200), -14), f: up, t: m(Y(285), Y(285), hy), w: [0.15, 0.7] },
+          { h: true, c: m(Y(285), Y(285), hy), f: 0, t: r.x, w: [0.2, 0.75] },
+          { h: true, c: m(Y(517), Y(472), hb), f: 0, t: r.x, w: [0.25, 0.8] },
+          { h: true, c: m(Y(540), Y(540), hb), f: vw, t: rx, w: [0.3, 0.85] },
+          { h: false, c: m(X(1123), X(1093), vw + 14), f: vh, t: m(Y(540), Y(540), hb), w: [0.35, 0.9] },
         );
       }
       const nowT = performance.now(), dts = Math.min(0.064, (nowT - lt) / 1000); lt = nowT; anim = false;
