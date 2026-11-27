@@ -58,7 +58,8 @@ export function Problems() {
       ol.parentElement!.style.setProperty("--stack-top", h.offsetHeight + "px");
       const peek = parseFloat(getComputedStyle(ol).getPropertyValue("--stack-peek")) || 0;
       const K = Math.max(...items.map((li, n) => n * peek + li.offsetHeight));
-      items.forEach((li, n) => { li.style.marginBottom = K - n * peek - li.offsetHeight + "px"; });
+      // every card keeps its own bottom margin so the pile unsticks as one piece, and the next card pulls back by the same amount so the gap between cards stays one even value
+      items.forEach((li, n) => { const mb = K - n * peek - li.offsetHeight; li.style.marginBottom = mb + "px"; if (items[n + 1]) items[n + 1].style.marginTop = -mb + "px"; });
       ol.parentElement!.style.setProperty("--lp-b", K + "px");
     };
     setTop();

@@ -260,7 +260,7 @@ a{color:#202329}a:hover{color:#000}
 .lp-ix{position:absolute;right:0;bottom:0;z-index:-1;font-size:7.5rem;line-height:1;font-weight:600;letter-spacing:-.04em;opacity:.05;transform:translate(.04em,.2em);font-variant-numeric:tabular-nums;pointer-events:none}
 @media (min-width:1024px){
  .lp-in{padding:var(--stack-top,0px) 48px 80px}.lp-hw{left:48px;right:48px;bottom:calc(80px + var(--lp-b,0px))}.lp-head{padding:64px 0 32px}
- .lp-stack{--stack-peek:14px;gap:30px}
+ .lp-stack{--stack-peek:14px;gap:64px}
  .lp-card{grid-template-columns:repeat(12,minmax(0,1fr))}
  .lp-l{grid-column:span 5;border-bottom:0;border-right:.5px solid var(--line);padding:36px 40px}
  .lp-r{grid-column:span 7;padding:36px 40px 36px 64px}
