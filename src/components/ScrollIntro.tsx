@@ -56,7 +56,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
     const cardEls = Array.from(st.querySelectorAll<HTMLElement>(".work .card"));
     const bV1 = q(".sx-v1"), bV2 = q(".sx-v2");
     let cur = 0, raf = 0, ld = 1, lraf = 0, tn = 1e9; // tn: ms since the page opened, only meaningful while the opening plays
-    const LS = 1500, FLY = 2300; // the big mark draws for LS ms, then settles into its place by FLY ms; the grid loader starts at LS
+    const LS = 2400, FLY = 3600; // the big mark draws for LS ms, then settles into its place by FLY ms; the grid loader starts at LS
     // lines are time-based, not scrubbed: scrolling past a mark makes a bar run its whole line by itself, so nothing hangs mid-screen
     const dS: number[] = [], eS: number[] = [];
     let lt = performance.now(), anim = false;
@@ -264,7 +264,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         lg.style.opacity = "1";
         lf.style.opacity = String(fl);
         lo.style.opacity = String(1 - fl);
-        los.forEach((e, i) => { const d = ease(seg(dr, i * 0.07, 0.55 + i * 0.07)); e.style.strokeDashoffset = String(1 - d); });
+        los.forEach((e, i) => { const d = ease(seg(dr, i * 0.1, 0.5 + i * 0.1)); e.style.strokeDashoffset = String(1 - d); });
       } else {
         b.style.clipPath = "";
         tx.style.opacity = "1";
