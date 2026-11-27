@@ -4,12 +4,15 @@ export function Footer() {
   return (
     <footer className="ft">
       <Row>
-        <div className="fg rv">
-          <div className="fh">
-            <p className="fbig">For teams who operate in possibilities, <span>not bandwidth.</span></p>
-          </div>
-          <div className="fcell"><p>Contact</p><a href="mailto:hello@byflint.studio">hello@byflint.studio</a><a href="tel:+917303415009">+91 73034 15009</a></div>
-          <div className="fcell"><p>Follow</p><a href="#">LinkedIn</a><a href="#">Instagram</a></div>
+        <div className="ft1 rv">
+          <p className="fbig">For teams who operate in possibilities, <span>not bandwidth.</span></p>
+          <a className="fmail" href="mailto:hello@byflint.studio">hello@byflint.studio</a>
+        </div>
+      </Row>
+      <Row>
+        <div className="ft2 rv">
+          <div className="fcol"><p>Contact</p><a href="tel:+917303415009">+91 73034 15009</a></div>
+          <div className="fcol"><p>Follow</p><a href="#">LinkedIn</a><a href="#">Instagram</a></div>
         </div>
       </Row>
       <Row>
