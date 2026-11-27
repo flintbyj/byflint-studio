@@ -3,7 +3,24 @@ import { Arrow, Mark, Row } from "./Mark";
 import { Reveal } from "./Reveal";
 import { Cursor } from "./Cursor";
 import { Footer } from "./Footer";
-import type { CaseStudy } from "@/lib/cases";
+import { CaseNav } from "./CaseNav";
+import type { CaseStudy, Visual } from "@/lib/cases";
+
+/* Visual slot. Drop an image path into `src` in cases.ts and it replaces the placeholder. */
+function Vis({ v, tone }: { v: Visual; tone?: string }) {
+  const k = v.kind === "phone" ? "por" : "lan";
+  return (
+    <figure className={"cs-vis " + k} style={tone ? { background: tone } : undefined}>
+      {v.src ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${v.src}`} alt={v.label} />
+      ) : (
+        <div className="slot"><Mark width={18} height={22} /><span>Visual to add</span></div>
+      )}
+      <figcaption>{v.label}</figcaption>
+    </figure>
+  );
+}
 
 export function CaseStudyPage({ c, next }: { c: CaseStudy; next: CaseStudy }) {
   return (
@@ -15,56 +32,61 @@ export function CaseStudyPage({ c, next }: { c: CaseStudy; next: CaseStudy }) {
         <Link className="logo" href="/" aria-label="Flint Studio home"><Mark /></Link>
         <a href="https://cal.com/byflint">Book a call</a>
       </header>
+      <CaseNav />
 
       <Row>
-        <section className="cs-hero" style={{ background: c.bg }}>
-          <Link className="cs-back" href="/#work">All work</Link>
-          <p className="cs-tag">{c.company} <span>{c.tag}</span></p>
-          <h1 className="cs-h1">{c.headline}</h1>
-          <p className="cs-sub">{c.sub}</p>
-          <div className="cs-nums">{c.stats.map((s) => (<div key={s.n}><p className="n">{s.n}</p><p className="nl">{s.l}</p></div>))}</div>
+        <section className="cs-hero" style={{ background: c.bg }} id="summary">
+          <div className="cs-ht">
+            <Link className="cs-back" href="/#work">All work</Link>
+            <p className="cs-tag">{c.company} <span>{c.tag}</span></p>
+            <h1 className="cs-h1">{c.headline}</h1>
+            <p className="cs-sub">{c.sub}</p>
+            <div className="cs-nums">{c.stats.map((s) => (<div key={s.n}><p className="n">{s.n}</p><p className="nl">{s.l}</p></div>))}</div>
+          </div>
+          <Vis v={c.heroVisual} tone="rgba(255,255,255,.55)" />
         </section>
       </Row>
 
       <Row>
-        <dl className="cs-facts rv">
-          {c.facts.map((f) => (<div key={f.k}><dt>{f.k}</dt><dd>{f.v}</dd></div>))}
-        </dl>
-      </Row>
-
-      <Row>
-        <div className="cs-pgi rv">
-          <div><p className="cs-k">Problem</p><p>{c.pgi.problem}</p></div>
-          <div><p className="cs-k">Solution</p><p>{c.pgi.solution}</p></div>
-          <div><p className="cs-k">Impact</p><p>{c.pgi.impact}</p></div>
+        <div className="cs-sum">
+          <div className="cs-ps">
+            <div><p className="cs-k">The problem</p><p>{c.pgi.problem}</p></div>
+            <div><p className="cs-k">What we did</p><p>{c.pgi.solution}</p></div>
+          </div>
+          <dl className="cs-facts">
+            {c.facts.map((f) => (<div key={f.k}><dt>{f.k}</dt><dd>{f.v}</dd></div>))}
+          </dl>
         </div>
       </Row>
 
       <Row>
-        <div className="cs-ch rv">
-          <p className="cs-k">The tension</p>
-          <div><h2 className="h2">{c.tension.h}</h2><p className="cs-p">{c.tension.p}</p></div>
-        </div>
-      </Row>
-      <Row>
-        <div className="cs-ch rv">
-          <p className="cs-k">The insight</p>
-          <div><h2 className="h2">{c.insight.h}</h2><p className="cs-p">{c.insight.p}</p></div>
+        <div className="cs-story" id="story">
+          <div className="rv">
+            <p className="cs-k">The tension</p>
+            <h2 className="cs-h3">{c.tension.h}</h2>
+            <p className="cs-p">{c.tension.p}</p>
+          </div>
+          <div className="rv">
+            <p className="cs-k">The insight</p>
+            <h2 className="cs-h3">{c.insight.h}</h2>
+            <p className="cs-p">{c.insight.p}</p>
+          </div>
         </div>
       </Row>
 
       <Row>
-        <div className="cs-dec">
-          <div className="cs-dh rv"><p className="cs-k">Key decisions</p><p className="cs-lead">{c.decisionsLead}</p></div>
+        <div className="cs-dec" id="decisions">
+          <div className="cs-dh rv"><p className="cs-k">Key decisions</p><h2 className="cs-h3">{c.decisionsLead}</h2></div>
           <ol>
             {c.decisions.map((d, i) => (
               <li key={d.t} className="rv">
-                <span className="ix">{String(i + 1).padStart(2, "0")}</span>
-                <div>
+                <div className="cs-dt">
+                  <span className="ix">{String(i + 1).padStart(2, "0")}</span>
                   <h3>{d.t}</h3>
                   <p>{d.d}</p>
                   {d.trade && <p className="cs-trade"><b>Trade-off</b> {d.trade}</p>}
                 </div>
+                <Vis v={d.visual} />
               </li>
             ))}
           </ol>
@@ -72,11 +94,19 @@ export function CaseStudyPage({ c, next }: { c: CaseStudy; next: CaseStudy }) {
       </Row>
 
       <Row>
-        <div className="cs-out rv">
-          <p className="cs-k">Outcome</p>
-          <div>
-            <h2 className="h2">{c.outcome.h}</h2>
-            <p className="cs-p">{c.outcome.p}</p>
+        <div className="cs-out" id="outcome">
+          <div className="cs-dh rv"><p className="cs-k">Outcome</p><h2 className="cs-h3">What changed</h2></div>
+          <div className="rv">
+            <ul className="cs-res">
+              {c.results.map((r) => (
+                <li key={r.k}>
+                  <span className="rk">{r.k}</span>
+                  {r.bar !== undefined && <span className="rb"><i style={{ width: r.bar + "%" }} /></span>}
+                  <span className="rv2"><b>{r.v}</b>{r.sub && <em>{r.sub}</em>}</span>
+                </li>
+              ))}
+            </ul>
+            {c.resultsNote && <p className="cs-honest">{c.resultsNote}</p>}
             {c.quote && (
               <blockquote className="cs-q">
                 <p>{c.quote.quote}</p>

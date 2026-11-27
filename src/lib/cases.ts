@@ -1,17 +1,21 @@
 import { testimonials } from "./content";
 
-export type Decision = { t: string; d: string; trade?: string };
+export type Visual = { label: string; kind?: "phone" | "wide"; src?: string };
+export type Decision = { t: string; d: string; trade?: string; visual: Visual };
+export type Result = { k: string; v: string; sub?: string; bar?: number };
 export type CaseStudy = {
   slug: string; company: string; tag: string; bg: string;
   headline: string; sub: string;
   stats: { n: string; l: string }[];
   facts: { k: string; v: string }[];
-  pgi: { problem: string; solution: string; impact: string };
+  heroVisual: Visual;
+  pgi: { problem: string; solution: string };
   tension: { h: string; p: string };
   insight: { h: string; p: string };
   decisionsLead: string;
   decisions: Decision[];
-  outcome: { h: string; p: string };
+  results: Result[];
+  resultsNote?: string;
   honest: string;
   quote?: { quote: string; name: string; role: string };
 };
@@ -28,10 +32,10 @@ export const caseStudies: CaseStudy[] = [
       { k: "Timeline", v: "4 weeks" },
       { k: "Platform", v: "Android app, synced to the web platform" },
     ],
+    heroVisual: { label: "Check-in flow: site list, location verified, selfie", kind: "phone" },
     pgi: {
       problem: "No system showed who was working where or whether a station was staffed. Former employees could keep access to equipment at swap stations.",
       solution: "One app that verifies every operator action with location, synced live to the web platform.",
-      impact: "96.4% of stations monitored in real time. Attendance verified by GPS. 300 inactive operators flagged and their access revoked.",
     },
     tension: {
       h: "A security gap hiding inside an attendance problem",
@@ -43,15 +47,16 @@ export const caseStudies: CaseStudy[] = [
     },
     decisionsLead: "Following one operator through a shift.",
     decisions: [
-      { t: "Check in: location every time, selfie once", d: "Operators can cover several sites in one shift. Every site check-in verifies location within 20 metres, but the selfie is taken only at the first site.", trade: "Less photo proof per site, in exchange for a check-in that does not repeat itself." },
-      { t: "Stay: ask only when the app goes quiet", d: "Presence checks arrive only after 60 minutes with no app activity. Opening a checklist or a ticket resets the timer, so busy operators are never interrupted. If location fails twice, the operator takes a photo at the site and a supervisor reviews it, so a weak GPS signal never blocks work.", trade: "Fewer automatic checks during active use, in exchange for no nagging." },
-      { t: "Check: one question per screen, built for the field", d: "Checklists show one question at a time with large Yes and No buttons and a progress bar. Photo and remarks are asked for only when the answer is No. Location is verified before a checklist opens, so it cannot be filled in from home." },
-      { t: "Leave: exits that are honest, not punitive", d: "Operators choose Temporarily left or Done for the shift, with a reason. The app shows time since leaving instead of asking for an expected return. Leaving before shift end shows a warning and notifies the supervisor automatically." },
+      { t: "Check in: location every time, selfie once", d: "Operators can cover several sites in one shift. Every site check-in verifies location within 20 metres, but the selfie is taken only at the first site.", trade: "Less photo proof per site, in exchange for a check-in that does not repeat itself.", visual: { label: "Check-in flow across several sites", kind: "phone" } },
+      { t: "Stay: ask only when the app goes quiet", d: "Presence checks arrive only after 60 minutes with no app activity. Opening a checklist or a ticket resets the timer, so busy operators are never interrupted. If location fails twice, the operator takes a photo at the site and a supervisor reviews it, so a weak GPS signal never blocks work.", trade: "Fewer automatic checks during active use, in exchange for no nagging.", visual: { label: "Presence check and photo fallback", kind: "phone" } },
+      { t: "Check: one question per screen, built for the field", d: "Checklists show one question at a time with large Yes and No buttons and a progress bar. Photo and remarks are asked for only when the answer is No. Location is verified before a checklist opens, so it cannot be filled in from home.", visual: { label: "One-question checklist", kind: "phone" } },
+      { t: "Leave: exits that are honest, not punitive", d: "Operators choose Temporarily left or Done for the shift, with a reason. The app shows time since leaving instead of asking for an expected return. Leaving before shift end shows a warning and notifies the supervisor automatically.", visual: { label: "Left-station choice and warning", kind: "phone" } },
     ],
-    outcome: {
-      h: "One live system for nearly 1,000 operators across 800+ stations",
-      p: "Station coverage is monitored in real time, attendance is GPS-verified, and 300 inactive operators were flagged and had their access revoked.",
-    },
+    results: [
+      { k: "Station coverage", v: "96.4%", sub: "of 800+ stations monitored in real time" },
+      { k: "Attendance", v: "GPS-verified", sub: "every check-in carries location and time" },
+      { k: "Inactive operators", v: "300 flagged", sub: "and their access revoked" },
+    ],
     honest: "Results are measured by Indofast across the whole platform. We designed both the app and the dashboard, and this story leads with the app because that is where operators create every record the dashboard shows.",
     quote: testimonials.indofast,
   },
@@ -65,10 +70,10 @@ export const caseStudies: CaseStudy[] = [
       { k: "Scope", v: "Field research, concept, UX and UI, QA, in-store test" },
       { k: "Type", v: "New product, zero to one" },
     ],
+    heroVisual: { label: "A customer using the analyser in store, with the result screen", kind: "wide" },
     pgi: {
       problem: "Offline sales had plateaued, and customers were engaging less with the store's beauty professionals.",
       solution: "A skin analyser that customers use on their own, designed for self-interaction from the start.",
-      impact: "Daily sales per store went from ₹2,500 to ₹3,600 up to ₹7,500 to ₹12,000, roughly 3x.",
     },
     tension: {
       h: "Sales had stalled where customers meet the brand",
@@ -80,14 +85,15 @@ export const caseStudies: CaseStudy[] = [
     },
     decisionsLead: "How we got from the gap to a shipped product.",
     decisions: [
-      { t: "Research in the stores", d: "We watched how customers and staff actually used the floor, and gathered feedback from both before designing anything." },
-      { t: "Design for use without staff", d: "The experience was designed from scratch so a customer can use it on their own, start to finish." },
-      { t: "Test it where it is used", d: "We ran final QA with engineering, then tested the analyser in stores after launch." },
+      { t: "Research in the stores", d: "We watched how customers and staff actually used the floor, and gathered feedback from both before designing anything.", visual: { label: "Store visits: customers and staff on the floor", kind: "wide" } },
+      { t: "Design for use without staff", d: "The experience was designed from scratch so a customer can use it on their own, start to finish.", visual: { label: "Analyser: start and result screens", kind: "phone" } },
+      { t: "Test it where it is used", d: "We ran final QA with engineering, then tested the analyser in stores after launch.", visual: { label: "In-store test setup", kind: "wide" } },
     ],
-    outcome: {
-      h: "About 3x daily sales in the stores that tested it",
-      p: "Daily sales per store went from ₹2,500 to ₹3,600 up to ₹7,500 to ₹12,000. On 300 trading days a year, that is an estimated ₹15L to ₹25L more per store, per year.",
-    },
+    results: [
+      { k: "Daily sales per store, before", v: "₹2,500 to ₹3,600", bar: 30 },
+      { k: "Daily sales per store, after", v: "₹7,500 to ₹12,000", sub: "roughly 3x", bar: 100 },
+      { k: "Estimated gain per store, per year", v: "₹15L to ₹25L", sub: "on 300 trading days" },
+    ],
     honest: "The daily figures are as shared by VLCC for the stores that tested the analyser. The annual figure is our estimate, assuming 300 trading days.",
     quote: testimonials.vlcc,
   },
@@ -102,10 +108,10 @@ export const caseStudies: CaseStudy[] = [
       { k: "Timeline", v: "2.5 weeks" },
       { k: "Platform", v: "Shopify, web and mobile" },
     ],
+    heroVisual: { label: "Bundle page on mobile, beside the three single-product pages", kind: "phone" },
     pgi: {
       problem: "Most customers bought the three products together, but had to add each one separately, at full price, through cluttered navigation.",
       solution: "A bundle page with a better price for the set customers already bought, plus simpler navigation.",
-      impact: "ROAS of 3.7 on the bundle page against 3.2, 3.6 and 2.6 on the three single-product pages. About 18% above their average.",
     },
     tension: {
       h: "Three good products, three separate checkouts",
@@ -117,15 +123,18 @@ export const caseStudies: CaseStudy[] = [
     },
     decisionsLead: "Following the shopper from first look to checkout.",
     decisions: [
-      { t: "See: sell the set customers were already buying", d: "The page opens with the line \"A single supplement won't cut it\" and presents gut health, fat burning and sleep as three angles on one goal. One month of the trio is ₹2,299, which is 18% less than adding the three products separately.", trade: "A lower price per product, in exchange for a bigger order and a better return on ad spend." },
-      { t: "Choose: make the bigger pack the easy choice", d: "Three pack sizes, labelled Trial Pack, Best Results and Money Saver, each show the rupee saving and the price per tablet, which falls from ₹12.77 to ₹9.44 on the largest pack. The comparison does the selling." },
-      { t: "Trust: answer the bundle doubt before it stops the sale", d: "A 4.9 rating from 134 reviews, press logos, certifications and a 90-day guarantee sit next to the button. The FAQ answers \"Can I take all three at the same time?\", the question a shopper has before buying a set." },
-      { t: "Navigate: three overlapping menus became one", d: "The old header had 8 top-level items, and three of them did the same job. We merged them into one Shop menu with sub-groups, and top-level items went from 8 to 5. Inside Shop, only the products in the group you point at are shown, instead of about 60 at once.", trade: "Shoppers who browse by ingredient lose the one-hover dropdown. In return, a separate Ingredients page now covers 100+ ingredients, against about 30 in the old menu." },
+      { t: "See: sell the set customers were already buying", d: "The page opens with the line \"A single supplement won't cut it\" and presents gut health, fat burning and sleep as three angles on one goal. One month of the trio is ₹2,299, which is 18% less than adding the three products separately.", trade: "A lower price per product, in exchange for a bigger order and a better return on ad spend.", visual: { label: "Bundle page: opening and pricing", kind: "phone" } },
+      { t: "Choose: make the bigger pack the easy choice", d: "Three pack sizes, labelled Trial Pack, Best Results and Money Saver, each show the rupee saving and the price per tablet, which falls from ₹12.77 to ₹9.44 on the largest pack. The comparison does the selling.", visual: { label: "Pack selector: Trial Pack, Best Results, Money Saver", kind: "phone" } },
+      { t: "Trust: answer the bundle doubt before it stops the sale", d: "A 4.9 rating from 134 reviews, press logos, certifications and a 90-day guarantee sit next to the button. The FAQ answers \"Can I take all three at the same time?\", the question a shopper has before buying a set.", visual: { label: "Trust block: rating, press, guarantee, FAQ", kind: "phone" } },
+      { t: "Navigate: three overlapping menus became one", d: "The old header had 8 top-level items, and three of them did the same job. We merged them into one Shop menu with sub-groups, and top-level items went from 8 to 5. Inside Shop, only the products in the group you point at are shown, instead of about 60 at once.", trade: "Shoppers who browse by ingredient lose the one-hover dropdown. In return, a separate Ingredients page now covers 100+ ingredients, against about 30 in the old menu.", visual: { label: "Old menus, first sketch, live Shop menu", kind: "wide" } },
     ],
-    outcome: {
-      h: "A bundle page that out-earned every single-product page",
-      p: "The bundle page reached a ROAS of 3.7. The single-product pages were at 3.2 (Gut Army), 3.6 (Fat Burner) and 2.6 (Sleep Ease).",
-    },
+    results: [
+      { k: "Bundle page", v: "3.7", sub: "ROAS", bar: 100 },
+      { k: "Fat Burner page", v: "3.6", bar: 97 },
+      { k: "Gut Army page", v: "3.2", bar: 86 },
+      { k: "Sleep Ease page", v: "2.6", bar: 70 },
+    ],
+    resultsNote: "The bundle page is about 18% above the average of the three single-product pages.",
     honest: "This compares the bundle page with the single-product pages over the same period. It was not a controlled A/B test.",
   },
 ];
