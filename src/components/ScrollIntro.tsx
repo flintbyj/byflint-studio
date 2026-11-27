@@ -343,7 +343,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         <span className="sx-logo" ref={logo} aria-hidden="true">
           <svg width={MW} height={MH} viewBox="0 0 168 204" style={{ overflow: "visible" }}>
             <g className="sx-lf" fill="currentColor"><Shapes /></g>
-            <g className="sx-lo" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinejoin="round"><Shapes outline /></g>
+            <g className="sx-lo" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"><Shapes outline /></g>
           </svg>
         </span>
       </div>
