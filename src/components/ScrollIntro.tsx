@@ -56,7 +56,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
     const cardEls = Array.from(st.querySelectorAll<HTMLElement>(".work .card"));
     const bV1 = q(".sx-v1"), bV2 = q(".sx-v2");
     let cur = 0, raf = 0, ld = 1, lraf = 0, tn = 1e9; // tn: ms since the page opened, only meaningful while the opening plays
-    const DR = 3800, LS = 4200, FLY = 5600; // draw ends at DR, the settle runs DR -> FLY, the grid loader starts at LS (a little into the settle) // the big mark draws for LS ms, then settles into its place by FLY ms; the grid loader starts at LS
+    const DR = 3200, LS = 0, FLY = 4400; // the mark draws until DR and settles by FLY while the grid lines draw at the same time; the colour wipe (ld .58) starts as the mark lands
     // lines are time-based, not scrubbed: scrolling past a mark makes a bar run its whole line by itself, so nothing hangs mid-screen
     const dS: number[] = [], eS: number[] = [];
     let lt = performance.now(), anim = false;
@@ -309,7 +309,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
     if (window.scrollY < 8) {
       ld = 0; tn = 0;
       root.style.overflow = "hidden";
-      const t0 = performance.now(), D = 3800;
+      const t0 = performance.now(), D = 7600;
       const run = (now: number) => {
         tn = now - t0;
         ld = Math.min(1, Math.max(0, (tn - LS) / D));
