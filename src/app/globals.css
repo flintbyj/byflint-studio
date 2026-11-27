@@ -132,6 +132,25 @@ a{color:#202329}a:hover{color:#000}
 @keyframes blink{0%,100%{opacity:.25}50%{opacity:1}}
 @keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .chat .end{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:12px;padding-top:14px;border-top:1px solid var(--line);font-size:14px;color:var(--mut)}
+/* faq accordion (mobile) */
+.acc{display:none}
+@media (max-width:820px){
+.chips,.chat{display:none}
+.acc{display:block;margin-top:24px;border-top:1px solid var(--line)}
+.ai{border-bottom:1px solid var(--line)}
+.aq{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0;border:0;background:transparent;font:inherit;font-size:16px;line-height:1.35;font-weight:500;text-align:left;color:var(--ink);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.aq i{flex:none;position:relative;width:14px;height:14px}
+.aq i:before,.aq i:after{content:"";position:absolute;left:0;top:6px;width:14px;height:2px;background:var(--ink);transition:transform .3s cubic-bezier(.22,1,.36,1)}
+.aq i:after{transform:rotate(90deg)}
+.ai.on .aq i:after{transform:rotate(0)}
+.aa{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s cubic-bezier(.22,1,.36,1)}
+.aa>div{overflow:hidden}
+.aa p{margin:0 0 20px;font-size:15px;line-height:1.6;color:#4A4A50}
+.ai.on .aa{grid-template-rows:1fr}
+.ai.on .aq{font-weight:600}
+.aend{display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:24px 0 8px;font-size:14px;color:var(--mut)}
+}
+@media (prefers-reduced-motion:reduce){.aa,.aq i:before,.aq i:after{transition:none}}
 /* footer */
 .gd,.gl{display:grid;grid-template-columns:repeat(40,minmax(0,1fr));column-gap:10px;padding:0 24px}
 .gd{padding-top:28px;padding-bottom:6px}

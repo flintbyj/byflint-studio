@@ -13,12 +13,23 @@ export function Faq() {
     setSel(i); setTyping(true);
     timer.current = setTimeout(() => setTyping(false), 750);
   };
-  const cur = faq[sel];
+  const cur = faq[sel < 0 ? 0 : sel];
   return (
     <Row>
       <div className="faq" id="faq">
         <div className="rv">
           <h2 className="h2">You might be<br /><span>wondering</span></h2>
+          <div className="acc">
+            {faq.map((f, i) => (
+              <div key={f.q} className={i === sel ? "ai on" : "ai"}>
+                <button type="button" className="aq" aria-expanded={i === sel} onClick={() => setSel(i === sel ? -1 : i)}>
+                  <span>{f.q}</span><i aria-hidden="true" />
+                </button>
+                <div className="aa"><div><p>{f.a}</p></div></div>
+              </div>
+            ))}
+            <div className="aend"><span>Something else on your mind?</span><a className="btn sm cit" href="https://cal.com/byflint">Ask us on a call <Arrow /></a></div>
+          </div>
           <div className="chips">
             {faq.map((f, i) => (
               <button type="button" key={f.q} className={i === sel ? "chip on" : "chip"} onClick={() => pick(i)}>{f.q}</button>
