@@ -3,9 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import { Arrow, Mark, Row } from "./Mark";
 import { faq } from "@/lib/content";
 
+const SHOWN = [5, 9, 99]; // questions visible after each "read more" on mobile
+
 export function Faq() {
   const [sel, setSel] = useState(0);
   const [typing, setTyping] = useState(false);
+  const [parts, setParts] = useState(1);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
   const pick = (i: number) => {
@@ -20,7 +23,7 @@ export function Faq() {
         <div className="rv">
           <h2 className="h2">You might be<br /><span>wondering</span></h2>
           <div className="acc">
-            {faq.map((f, i) => (
+            {faq.map((f, i) => i < SHOWN[parts - 1] && (
               <div key={f.q} className={i === sel ? "ai on" : "ai"}>
                 <button type="button" className="aq" aria-expanded={i === sel} onClick={() => setSel(i === sel ? -1 : i)}>
                   <span>{f.q}</span><i aria-hidden="true" />
@@ -28,6 +31,11 @@ export function Faq() {
                 <div className="aa"><div><p>{f.a}</p></div></div>
               </div>
             ))}
+            {parts < 3 && (
+              <button type="button" className="amore" onClick={() => setParts(parts + 1)}>
+                Read more questions <span>{Math.min(SHOWN[parts], faq.length) - SHOWN[parts - 1]}</span>
+              </button>
+            )}
             <div className="aend"><span>Something else on your mind?</span><a className="btn sm cit" href="https://cal.com/byflint">Ask us on a call <Arrow /></a></div>
           </div>
           <div className="chips">
