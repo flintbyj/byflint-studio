@@ -55,7 +55,8 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
     const ctaEl = st.querySelector<HTMLElement>(".hero .cta");
     const cardEls = Array.from(st.querySelectorAll<HTMLElement>(".work .card"));
     const bV1 = q(".sx-v1"), bV2 = q(".sx-v2");
-    let cur = 0, raf = 0, ld = 1, lraf = 0;
+    let cur = 0, raf = 0, ld = 1, lraf = 0, tn = 1e9; // tn: ms since the page opened, only meaningful while the opening plays
+    const LS = 1500, FLY = 2300; // the big mark draws for LS ms, then settles into its place by FLY ms; the grid loader starts at LS
     // lines are time-based, not scrubbed: scrolling past a mark makes a bar run its whole line by itself, so nothing hangs mid-screen
     const dS: number[] = [], eS: number[] = [];
     let lt = performance.now(), anim = false;
@@ -155,8 +156,12 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         const g = ease(seg(p, 0.5, 0.88));
         lx = lerp(s2.x + o2.x, T.x, g); ly = lerp(s2.y + o2.y, T.y, g); ls = lerp(f2, 1, g);
       }
+      if (tn < FLY) { // opening: the mark is drawn big in the centre of the screen, then settles into its place in the box
+        const fb = Math.min(vh * 0.3, vw * 0.5) / MH, fy = ease(seg(tn, LS, FLY));
+        lx = lerp(vw / 2 - (MW * fb) / 2, lx, fy); ly = lerp(vh / 2 - (MH * fb) / 2, ly, fy); ls = lerp(fb, ls, fy);
+      }
       lg.style.transform = `translate(${lx}px,${ly}px) scale(${ls})`;
-      lg.style.color = a > 0.14 ? `rgb(${SLATE})` : `rgb(${CIT})`;
+      lg.style.color = a > 0.14 ? `rgb(${SLATE})` : ld < 0.66 ? `rgb(${INK})` : `rgb(${CIT})`;
 
       const rx = r.x + r.w, by = r.y + r.h;
       const v1Rest = mob ? s2.y - 60 : Y(58), v2Rest = mob ? s2.y + s2.h + 14 : Y(728);
@@ -255,7 +260,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         b.style.clipPath = `inset(${clampN((1 - rv) * 100)}% 0 0 0)`;
         tx.style.opacity = String(tf);
         // Dropbox-style formation: outline strokes draw in over the lines, then the fill comes in
-        const dr = ease(seg(ld, 0.62, 0.9)), fl = ease(seg(ld, 0.86, 1));
+        const dr = ease(seg(tn, 0, LS)), fl = ease(seg(ld, 0.86, 1));
         lg.style.opacity = "1";
         lf.style.opacity = String(fl);
         lo.style.opacity = String(1 - fl);
@@ -302,14 +307,15 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
     const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
     cur = target();
     if (window.scrollY < 8) {
-      ld = 0;
+      ld = 0; tn = 0;
       root.style.overflow = "hidden";
       const t0 = performance.now(), D = 3800;
       const run = (now: number) => {
-        ld = Math.min(1, (now - t0) / D);
+        tn = now - t0;
+        ld = Math.min(1, Math.max(0, (tn - LS) / D));
         draw(cur);
         if (ld < 1) lraf = requestAnimationFrame(run);
-        else { root.style.overflow = ""; kick(); }
+        else { tn = 1e9; root.style.overflow = ""; kick(); }
       };
       lraf = requestAnimationFrame(run);
     }
