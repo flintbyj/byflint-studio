@@ -32,8 +32,8 @@ export function FooterArt() {
       raf = cur === target ? 0 : requestAnimationFrame(tick);
     };
     const onScroll = () => {
-      const r = foot.getBoundingClientRect();
-      target = reduce ? 0 : Math.min(1, Math.max(0, (window.innerHeight - r.top) / (r.height * 0.9)));
+      const r = c!.getBoundingClientRect();
+      target = reduce ? 0 : Math.min(1, Math.max(0, (window.innerHeight - r.top) / (r.height * 0.7)));
       if (!raf) raf = requestAnimationFrame(tick);
     };
     onScroll();
