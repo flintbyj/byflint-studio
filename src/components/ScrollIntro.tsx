@@ -56,7 +56,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
     const cardEls = Array.from(st.querySelectorAll<HTMLElement>(".work .card"));
     const bV1 = q(".sx-v1"), bV2 = q(".sx-v2");
     let cur = 0, raf = 0, ld = 1, lraf = 0, tn = 1e9; // tn: ms since the page opened, only meaningful while the opening plays
-    const DR = 3200, LS = 0, FLY = 4400; // the mark draws until DR and settles by FLY while the grid lines draw at the same time; the colour wipe (ld .58) starts as the mark lands
+    const DR = 1400, LS = 0, FLY = 2100; // the mark draws until DR and settles by FLY while the grid lines draw at the same time; the colour wipe (ld .58) starts as the mark lands
     // lines are time-based, not scrubbed: scrolling past a mark makes a bar run its whole line by itself, so nothing hangs mid-screen
     const dS: number[] = [], eS: number[] = [];
     let lt = performance.now(), anim = false;
@@ -157,7 +157,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         lx = lerp(s2.x + o2.x, T.x, g); ly = lerp(s2.y + o2.y, T.y, g); ls = lerp(f2, 1, g);
       }
       if (tn < FLY) { // opening: the mark is drawn big in the centre of the screen, then settles into its place in the box
-        const fb = Math.min(vh * 0.3, vw * 0.5) / MH, fy = ease(seg(tn, DR, FLY));
+        const fb = Math.min(vh * 0.3, vw * 0.5) / MH, fy = 1 - Math.pow(1 - seg(tn, DR, FLY), 3);
         lx = lerp(vw / 2 - (MW * fb) / 2, lx, fy); ly = lerp(vh / 2 - (MH * fb) / 2, ly, fy); ls = lerp(fb, ls, fy);
       }
       lg.style.transform = `translate(${lx}px,${ly}px) scale(${ls})`;
@@ -309,7 +309,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
     if (window.scrollY < 8) {
       ld = 0; tn = 0;
       root.style.overflow = "hidden";
-      const t0 = performance.now(), D = 7600;
+      const t0 = performance.now(), D = 3600;
       const run = (now: number) => {
         tn = now - t0;
         ld = Math.min(1, Math.max(0, (tn - LS) / D));
