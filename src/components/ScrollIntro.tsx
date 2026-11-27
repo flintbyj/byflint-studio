@@ -56,7 +56,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
     const cardEls = Array.from(st.querySelectorAll<HTMLElement>(".work .card"));
     const bV1 = q(".sx-v1"), bV2 = q(".sx-v2");
     let cur = 0, raf = 0, ld = 1, lraf = 0, tn = 1e9; // tn: ms since the page opened, only meaningful while the opening plays
-    const LS = 2400, FLY = 3600; // the big mark draws for LS ms, then settles into its place by FLY ms; the grid loader starts at LS
+    const DR = 3800, LS = 4200, FLY = 5600; // draw ends at DR, the settle runs DR -> FLY, the grid loader starts at LS (a little into the settle) // the big mark draws for LS ms, then settles into its place by FLY ms; the grid loader starts at LS
     // lines are time-based, not scrubbed: scrolling past a mark makes a bar run its whole line by itself, so nothing hangs mid-screen
     const dS: number[] = [], eS: number[] = [];
     let lt = performance.now(), anim = false;
@@ -157,7 +157,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         lx = lerp(s2.x + o2.x, T.x, g); ly = lerp(s2.y + o2.y, T.y, g); ls = lerp(f2, 1, g);
       }
       if (tn < FLY) { // opening: the mark is drawn big in the centre of the screen, then settles into its place in the box
-        const fb = Math.min(vh * 0.3, vw * 0.5) / MH, fy = ease(seg(tn, LS, FLY));
+        const fb = Math.min(vh * 0.3, vw * 0.5) / MH, fy = ease(seg(tn, DR, FLY));
         lx = lerp(vw / 2 - (MW * fb) / 2, lx, fy); ly = lerp(vh / 2 - (MH * fb) / 2, ly, fy); ls = lerp(fb, ls, fy);
       }
       lg.style.transform = `translate(${lx}px,${ly}px) scale(${ls})`;
@@ -260,7 +260,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
         b.style.clipPath = `inset(${clampN((1 - rv) * 100)}% 0 0 0)`;
         tx.style.opacity = String(tf);
         // Dropbox-style formation: outline strokes draw in over the lines, then the fill comes in
-        const dr = ease(seg(tn, 0, LS)), fl = ease(seg(ld, 0.86, 1));
+        const dr = ease(seg(tn, 0, DR)), fl = ease(seg(ld, 0.86, 1));
         lg.style.opacity = "1";
         lf.style.opacity = String(fl);
         lo.style.opacity = String(1 - fl);
