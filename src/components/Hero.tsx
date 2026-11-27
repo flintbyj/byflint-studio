@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Mark, Arrow, Row } from "./Mark";
 import { cases } from "@/lib/content";
 
@@ -20,7 +21,7 @@ export function Hero() {
                 <p className="co">{c.company}</p>
                 <p className="s">{c.before}<b>{c.brand}</b>{c.after}</p>
                 <div className="nums">{c.stats.map((s) => (<div key={s.n}><p className="n">{s.n}</p><p className="nl">{s.l}</p></div>))}</div>
-                <a className="btn sm" href="#">Read the story <Arrow /></a>
+                <Link className="btn sm" href={`/work/${c.id}`}>Read the story <Arrow /></Link>
               </div>
               <div className="ph"><div className="phone">Drop screen</div></div>
             </article>
