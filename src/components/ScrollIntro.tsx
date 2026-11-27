@@ -56,7 +56,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
     const cardEls = Array.from(st.querySelectorAll<HTMLElement>(".work .card"));
     const bV1 = q(".sx-v1"), bV2 = q(".sx-v2");
     let cur = 0, raf = 0, ld = 1, lraf = 0, tn = 1e9; // tn: ms since the page opened, only meaningful while the opening plays
-    const DR = 1400, LS = 0, FLY = 2100, GR = 1250; // the mark draws until DR and settles by FLY while the grid lines draw at the same time; the colour wipe (ld .58) starts as the mark lands
+    const DR = 1400, LS = 0, FLY = 2100; // the mark draws until DR and settles by FLY while the grid lines draw at the same time; the colour wipe (ld .58) starts as the mark lands
     // lines are time-based, not scrubbed: scrolling past a mark makes a bar run its whole line by itself, so nothing hangs mid-screen
     const dS: number[] = [], eS: number[] = [];
     let lt = performance.now(), anim = false;
@@ -312,7 +312,7 @@ export function ScrollIntro({ children }: { children: React.ReactNode }) {
       const t0 = performance.now(), D = 3600;
       const run = (now: number) => {
         tn = now - t0;
-        ld = tn < GR ? (tn / GR) * 0.58 : tn < FLY ? 0.58 : Math.min(1, 0.58 + ((tn - FLY) / (D * 0.42)) * 0.42); // the grid lines (ld 0 to .58) draw in GR ms; the colour and text (ld .58 to 1) wait for the mark to land
+        ld = Math.min(1, Math.max(0, (tn - LS) / D));
         draw(cur);
         if (ld < 1) lraf = requestAnimationFrame(run);
         else { tn = 1e9; root.style.overflow = ""; kick(); }
