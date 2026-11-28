@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 
-const items = [["summary", "Summary"], ["story", "Story"], ["decisions", "Decisions"], ["outcome", "Outcome"]] as const;
+const items = [["summary", "Summary"], ["story", "Story"], ["screens", "Screens"], ["outcome", "Proof"]] as const;
 
 /* Sticky in-page index: shows where you are on a long page and lets you jump. */
 export function CaseNav() {

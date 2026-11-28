@@ -48,54 +48,36 @@ export function CaseStudyPage({ c, next }: { c: CaseStudy; next: CaseStudy }) {
       </Row>
 
       <Row>
-        <div className="cs-sum">
-          <div className="cs-ps">
-            <div><p className="cs-k">The problem</p><p>{c.pgi.problem}</p></div>
-            <div><p className="cs-k">What we did</p><p>{c.pgi.solution}</p></div>
-          </div>
-          <dl className="cs-facts">
-            {c.facts.map((f) => (<div key={f.k}><dt>{f.k}</dt><dd>{f.v}</dd></div>))}
-          </dl>
+        <dl className="cs-facts">
+          {c.facts.map((f) => (<div key={f.k}><dt>{f.k}</dt><dd>{f.v}</dd></div>))}
+        </dl>
+      </Row>
+
+      <Row>
+        <div className="cs-story rv" id="story">
+          {([["01", "About the company", c.about], ["02", "The challenge", c.challenge], ["03", "Our solution and its impact", c.solution]] as const).map(([n, k, t]) => (
+            <div key={n}><p className="cs-k"><span>{n}</span>{k}</p><p className="cs-p">{t}</p></div>
+          ))}
         </div>
       </Row>
 
       <Row>
-        <div className="cs-story" id="story">
-          <div className="rv">
-            <p className="cs-k">The tension</p>
-            <h2 className="cs-h3">{c.tension.h}</h2>
-            <p className="cs-p">{c.tension.p}</p>
-          </div>
-          <div className="rv">
-            <p className="cs-k">The insight</p>
-            <h2 className="cs-h3">{c.insight.h}</h2>
-            <p className="cs-p">{c.insight.p}</p>
-          </div>
-        </div>
-      </Row>
-
-      <Row>
-        <div className="cs-dec" id="decisions">
-          <div className="cs-dh rv"><p className="cs-k">Key decisions</p><h2 className="cs-h3">{c.decisionsLead}</h2></div>
-          <ol>
-            {c.decisions.map((d, i) => (
-              <li key={d.t} className="rv">
-                <div className="cs-dt">
-                  <span className="ix">{String(i + 1).padStart(2, "0")}</span>
-                  <h3>{d.t}</h3>
-                  <p>{d.d}</p>
-                  {d.trade && <p className="cs-trade"><b>Trade-off</b> {d.trade}</p>}
-                </div>
-                <Vis v={d.visual} />
-              </li>
+        <div className="cs-screens" id="screens">
+          <p className="cs-k">Screens</p>
+          <div className="cs-gal">
+            {c.shots.map((x, i) => (
+              <div key={x.t} className={"cs-shot rv " + (x.visual.kind === "phone" ? "por" : "lan")}>
+                <Vis v={x.visual} />
+                <p className="cs-cap"><span>{String(i + 1).padStart(2, "0")}</span><b>{x.t}</b> {x.cap}</p>
+              </div>
             ))}
-          </ol>
+          </div>
         </div>
       </Row>
 
       <Row>
         <div className="cs-out" id="outcome">
-          <div className="cs-dh rv"><p className="cs-k">Outcome</p><h2 className="cs-h3">What changed</h2></div>
+          <div className="cs-dh rv"><p className="cs-k">Proof</p><h2 className="cs-h3">What changed</h2></div>
           <div className="rv">
             <ul className="cs-res">
               {c.results.map((r) => (
