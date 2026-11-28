@@ -49,7 +49,7 @@ export function CaseStudyPage({ c, next }: { c: CaseStudy; next: CaseStudy }) {
             <h1 className="cs-h1">{c.headline}</h1>
             <p className="cs-sub">{c.sub}</p>
           </div>
-          <Vis v={c.heroVisual} tone="rgba(255,255,255,.55)" />
+          <Vis v={c.heroVisual} tone="transparent" />
         </section>
       </Row>
 
@@ -57,7 +57,7 @@ export function CaseStudyPage({ c, next }: { c: CaseStudy; next: CaseStudy }) {
         <div className="cs-chap" id="story">
           <div className="cs-ch rv">
             <div className="cs-tx"><p className="cs-k"><span>01</span>About the company</p><Lead t={c.about} /></div>
-            <div className="cs-pn cs-pn-n">{c.stats.map((s) => (<div key={s.n}><p className="n">{s.n}</p><p className="nl">{s.l}</p></div>))}</div>
+            <div className="cs-pn cs-pn-n"><div className="cs-st3">{c.stats.map((s) => (<div key={s.n}><p className="n">{s.n}</p><p className="nl">{s.l}</p></div>))}</div>{/* eslint-disable-next-line @next/next/no-img-element */}{c.aboutImg && <img className="cs-aimg" alt="Operator app, assigned sites" src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${c.aboutImg}`} />}</div>
           </div>
           <div className="cs-ch flip rv">
             <div className="cs-tx"><p className="cs-k"><span>02</span>The challenge</p><Lead t={c.challenge} /></div>

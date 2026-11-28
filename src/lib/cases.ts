@@ -13,6 +13,7 @@ export type CaseStudy = {
   heroVisual: Visual;
   about: string; challenge: string; solution: string;
   pains: string[];
+  aboutImg?: string;
   shots: Shot[];
   results: Result[];
   resultsNote?: string;
@@ -31,7 +32,8 @@ export const caseStudies: CaseStudy[] = [
       { k: "Timeline", v: "4 weeks" },
       { k: "Platform", v: "Android app, synced to web" },
     ],
-    heroVisual: { label: "Operator home: today's shift and assigned sites", kind: "phone", src: "/indofast/hero.webp" },
+    heroVisual: { label: "Operator app: home, location check and checklist", kind: "wide", src: "/indofast/hero-fan.webp" },
+    aboutImg: "/indofast/about.webp",
     pains: ["No live view of who is on site", "Self-reported attendance", "Checklists on paper", "Access removed by hand, over email"],
     about: "Indofast Energy is a battery-swapping network, a joint venture of Indian Oil and Sun Mobility. More than 800 swap stations across the country are run by nearly 1,000 operators, hired through partner agencies.",
     challenge: "Nobody could see whether a station was staffed right now. Attendance was self-reported, checklists lived on paper and coordination happened over phone calls. Removing a departed operator's access was a manual, email-based process, so former employees could keep physical access to equipment at swap stations.",
