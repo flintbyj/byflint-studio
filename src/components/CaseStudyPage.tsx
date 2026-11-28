@@ -22,13 +22,6 @@ function Vis({ v, tone }: { v: Visual; tone?: string }) {
   );
 }
 
-/* First sentence large, the rest quiet: gives each paragraph an entry point. */
-function Lead({ t }: { t: string }) {
-  const i = t.search(/\.\s/);
-  const lead = i > 0 ? t.slice(0, i + 1) : t, rest = i > 0 ? t.slice(i + 2) : "";
-  return (<><p className="cs-lead">{lead}</p>{rest && <p className="cs-p">{rest}</p>}</>);
-}
-
 export function CaseStudyPage({ c, next }: { c: CaseStudy; next: CaseStudy }) {
   return (
     <div className="v3 cs">
@@ -48,44 +41,34 @@ export function CaseStudyPage({ c, next }: { c: CaseStudy; next: CaseStudy }) {
             <p className="cs-tag">{c.company} <span>{c.tag}</span></p>
             <h1 className="cs-h1">{c.headline}</h1>
             <p className="cs-sub">{c.sub}</p>
+            <div className="cs-nums">{c.stats.map((s) => (<div key={s.n}><p className="n">{s.n}</p><p className="nl">{s.l}</p></div>))}</div>
           </div>
-          <Vis v={c.heroVisual} tone="transparent" />
+          <Vis v={c.heroVisual} tone="rgba(255,255,255,.55)" />
         </section>
       </Row>
 
       <Row>
-        <div className="cs-stats rv">{c.stats.map((s) => (<div key={s.n}><p className="n">{s.n}</p><p className="nl">{s.l}</p></div>))}</div>
+        <dl className="cs-facts">
+          {c.facts.map((f) => (<div key={f.k}><dt>{f.k}</dt><dd>{f.v}</dd></div>))}
+        </dl>
       </Row>
 
       <Row>
-        <div className="cs-cols" id="story">
-          {([["01", "About the company", c.about], ["02", "The challenge", c.challenge], ["03", "Our solution and its impact", c.solution]] as const).map(([n, k, t], i) => (
-            <div key={n} className="cs-col rv">
-              <div className="cs-tx"><p className="cs-k"><span>{n}</span>{k}</p><Lead t={t} /></div>
-              <div className="cs-cv">
-                {i === 1 ? (
-                  <ul className="cs-pains">{c.pains.map((x) => (<li key={x}>{x}</li>))}</ul>
-                ) : c.colImgs?.[i] ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img alt="" src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${c.colImgs[i]}`} />
-                ) : (
-                  <div className="slot"><Mark width={18} height={22} /><span>Visual to add</span></div>
-                )}
-              </div>
-            </div>
+        <div className="cs-story rv" id="story">
+          {([["01", "About the company", c.about], ["02", "The challenge", c.challenge], ["03", "Our solution and its impact", c.solution]] as const).map(([n, k, t]) => (
+            <div key={n}><p className="cs-k"><span>{n}</span>{k}</p><p className="cs-p">{t}</p></div>
           ))}
         </div>
       </Row>
 
       <Row>
         <div className="cs-screens" id="screens">
-          <div className="cs-sh"><p className="cs-k">Screens</p><h2 className="cs-h3">How it works, step by step</h2></div>
+          <p className="cs-k">Screens</p>
           <div className="cs-gal">
             {c.shots.map((x, i) => (
-              <div key={x.t} className={"cs-shot " + (x.visual.kind === "phone" ? "por" : "lan")}>
-                <p className="cs-st"><span>{String(i + 1).padStart(2, "0")}</span><b>{x.t}</b></p>
+              <div key={x.t} className={"cs-shot rv " + (x.visual.kind === "phone" ? "por" : "lan")}>
                 <Vis v={x.visual} />
-                <p className="cs-cap">{x.cap}</p>
+                <p className="cs-cap"><span>{String(i + 1).padStart(2, "0")}</span><b>{x.t}</b> {x.cap}</p>
               </div>
             ))}
           </div>
