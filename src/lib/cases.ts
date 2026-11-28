@@ -13,7 +13,7 @@ export type CaseStudy = {
   heroVisual: Visual;
   about: string; challenge: string; solution: string;
   pains: string[];
-  aboutImg?: string;
+  colImgs?: (string | undefined)[];
   shots: Shot[];
   results: Result[];
   resultsNote?: string;
@@ -33,16 +33,18 @@ export const caseStudies: CaseStudy[] = [
       { k: "Platform", v: "Android app, synced to web" },
     ],
     heroVisual: { label: "Operator app: home, location check and checklist", kind: "wide", src: "/indofast/hero-fan.webp" },
-    aboutImg: "/indofast/about.webp",
+    colImgs: ["/indofast/about.webp", undefined, "/indofast/col3.webp"],
     pains: ["No live view of who is on site", "Self-reported attendance", "Checklists on paper", "Access removed by hand, over email"],
     about: "Indofast Energy is a battery-swapping network, a joint venture of Indian Oil and Sun Mobility. More than 800 swap stations across the country are run by nearly 1,000 operators, hired through partner agencies.",
     challenge: "Nobody could see whether a station was staffed right now. Attendance was self-reported, checklists lived on paper and coordination happened over phone calls. Removing a departed operator's access was a manual, email-based process, so former employees could keep physical access to equipment at swap stations.",
     solution: "We designed the operator app, synced live to the web platform. Every check-in, presence check and exit carries location and time, and a checklist opens only at the site. It took 4 weeks. 96.4% of stations are now monitored in real time, attendance is GPS-verified, and 300 inactive operators were flagged and their access revoked.",
     shots: [
-      { t: "Check in", cap: "Location verified at every site, selfie once per shift.", visual: { label: "Location verified", kind: "phone", src: "/indofast/checkin.webp" } },
-      { t: "Verify", cap: "If location cannot be verified, a selfie at the site goes for review.", visual: { label: "Photo fallback", kind: "phone", src: "/indofast/verify.webp" } },
-      { t: "Check", cap: "One question per screen, location verified first.", visual: { label: "One-question checklist", kind: "phone", src: "/indofast/checklist.webp" } },
-      { t: "Leave", cap: "Every exit needs a reason.", visual: { label: "Leaving a station", kind: "phone", src: "/indofast/leave.webp" } },
+      { t: "Start shift", cap: "Today's shift and the sites assigned.", visual: { label: "Operator home", kind: "phone", src: "/indofast/s1.webp" } },
+      { t: "Check in", cap: "Location verified at every site, selfie once per shift.", visual: { label: "Location verified", kind: "phone", src: "/indofast/s2.webp" } },
+      { t: "Verify", cap: "If location cannot be verified, a selfie at the site goes for review.", visual: { label: "Photo fallback", kind: "phone", src: "/indofast/s3.webp" } },
+      { t: "Checklist", cap: "One question per screen.", visual: { label: "Checklist", kind: "phone", src: "/indofast/s4.webp" } },
+      { t: "Leave", cap: "Every exit needs a reason.", visual: { label: "Leaving a station", kind: "phone", src: "/indofast/s5.webp" } },
+      { t: "Tickets", cap: "Open issues by status and urgency.", visual: { label: "Tickets", kind: "phone", src: "/indofast/s6.webp" } },
     ],
     results: [
       { k: "Station coverage", v: "96.4%", sub: "of 800+ stations monitored in real time" },

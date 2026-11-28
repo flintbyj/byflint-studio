@@ -54,19 +54,26 @@ export function CaseStudyPage({ c, next }: { c: CaseStudy; next: CaseStudy }) {
       </Row>
 
       <Row>
-        <div className="cs-chap" id="story">
-          <div className="cs-ch rv">
-            <div className="cs-tx"><p className="cs-k"><span>01</span>About the company</p><Lead t={c.about} /></div>
-            <div className="cs-pn cs-pn-n"><div className="cs-st3">{c.stats.map((s) => (<div key={s.n}><p className="n">{s.n}</p><p className="nl">{s.l}</p></div>))}</div>{/* eslint-disable-next-line @next/next/no-img-element */}{c.aboutImg && <img className="cs-aimg" alt="Operator app, assigned sites" src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${c.aboutImg}`} />}</div>
-          </div>
-          <div className="cs-ch flip rv">
-            <div className="cs-tx"><p className="cs-k"><span>02</span>The challenge</p><Lead t={c.challenge} /></div>
-            <ul className="cs-pn cs-pn-p">{c.pains.map((x) => (<li key={x}>{x}</li>))}</ul>
-          </div>
-          <div className="cs-ch rv">
-            <div className="cs-tx"><p className="cs-k"><span>03</span>Our solution and its impact</p><Lead t={c.solution} /></div>
-            <dl className="cs-pn cs-pn-f">{c.facts.map((f) => (<div key={f.k}><dt>{f.k}</dt><dd>{f.v}</dd></div>))}</dl>
-          </div>
+        <div className="cs-stats rv">{c.stats.map((s) => (<div key={s.n}><p className="n">{s.n}</p><p className="nl">{s.l}</p></div>))}</div>
+      </Row>
+
+      <Row>
+        <div className="cs-cols" id="story">
+          {([["01", "About the company", c.about], ["02", "The challenge", c.challenge], ["03", "Our solution and its impact", c.solution]] as const).map(([n, k, t], i) => (
+            <div key={n} className="cs-col rv">
+              <div className="cs-tx"><p className="cs-k"><span>{n}</span>{k}</p><Lead t={t} /></div>
+              <div className="cs-cv">
+                {i === 1 ? (
+                  <ul className="cs-pains">{c.pains.map((x) => (<li key={x}>{x}</li>))}</ul>
+                ) : c.colImgs?.[i] ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img alt="" src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${c.colImgs[i]}`} />
+                ) : (
+                  <div className="slot"><Mark width={18} height={22} /><span>Visual to add</span></div>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       </Row>
 
@@ -75,7 +82,7 @@ export function CaseStudyPage({ c, next }: { c: CaseStudy; next: CaseStudy }) {
           <div className="cs-sh"><p className="cs-k">Screens</p><h2 className="cs-h3">How it works, step by step</h2></div>
           <div className="cs-gal">
             {c.shots.map((x, i) => (
-              <div key={x.t} className={"cs-shot rv " + (x.visual.kind === "phone" ? "por" : "lan")}>
+              <div key={x.t} className={"cs-shot " + (x.visual.kind === "phone" ? "por" : "lan")}>
                 <p className="cs-st"><span>{String(i + 1).padStart(2, "0")}</span><b>{x.t}</b></p>
                 <Vis v={x.visual} />
                 <p className="cs-cap">{x.cap}</p>
