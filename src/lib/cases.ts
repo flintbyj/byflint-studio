@@ -12,6 +12,7 @@ export type CaseStudy = {
   facts: { k: string; v: string }[];
   heroVisual: Visual;
   about: string; challenge: string; solution: string;
+  pains: string[];
   shots: Shot[];
   results: Result[];
   resultsNote?: string;
@@ -31,6 +32,7 @@ export const caseStudies: CaseStudy[] = [
       { k: "Platform", v: "Android app, synced to web" },
     ],
     heroVisual: { label: "Operator home: today's shift and assigned sites", kind: "phone", src: "/indofast/hero.webp" },
+    pains: ["No live view of who is on site", "Self-reported attendance", "Checklists on paper", "Access removed by hand, over email"],
     about: "Indofast Energy is a battery-swapping network, a joint venture of Indian Oil and Sun Mobility. More than 800 swap stations across the country are run by nearly 1,000 operators, hired through partner agencies.",
     challenge: "Nobody could see whether a station was staffed right now. Attendance was self-reported, checklists lived on paper and coordination happened over phone calls. Removing a departed operator's access was a manual, email-based process, so former employees could keep physical access to equipment at swap stations.",
     solution: "We designed the operator app, synced live to the web platform. Every check-in, presence check and exit carries location and time, and a checklist opens only at the site. It took 4 weeks. 96.4% of stations are now monitored in real time, attendance is GPS-verified, and 300 inactive operators were flagged and their access revoked.",
@@ -59,6 +61,7 @@ export const caseStudies: CaseStudy[] = [
       { k: "Test", v: "In-store, after launch" },
     ],
     heroVisual: { label: "A customer using the analyser in store, with the result screen", kind: "wide" },
+    pains: ["Offline sales had plateaued", "Less time with beauty professionals", "Analysers needed staff beside the customer"],
     about: "VLCC Healthcare runs wellness and beauty stores across India, where customers talk to beauty professionals before they buy.",
     challenge: "Offline sales had plateaued and customers were engaging less with the store's beauty professionals. Other brands already used skin analysers in store, but staff had to run them, so none worked without someone standing beside the customer.",
     solution: "We visited stores, gathered feedback from customers and staff, and designed a skin analyser a customer can use alone from start to finish. After final QA with engineering, it was tested in stores. Daily sales per store rose from ₹2,500 to ₹3,600 up to ₹7,500 to ₹12,000, roughly 3x, with no staff needed to run it.",
@@ -86,6 +89,7 @@ export const caseStudies: CaseStudy[] = [
       { k: "Platform", v: "Shopify, web and mobile" },
     ],
     heroVisual: { label: "Bundle page on mobile, beside the three single-product pages", kind: "phone" },
+    pains: ["Three separate product pages", "Added one at a time, at full price", "Hundreds of products in the menu"],
     about: "Zeroharm is a D2C wellness brand selling supplements online on Shopify. Three of its products cover gut health, fat burning and sleep.",
     challenge: "Most customers bought the three together, but each product had its own page, so they added them one at a time at full price, through a menu crowded with hundreds of products. The demand for a bundle already existed. The site made shoppers assemble it by hand.",
     solution: "In 2.5 weeks we built a bundle page priced 18% below buying the three separately, with a clear pack comparison and trust details beside the button. We also merged three overlapping menus into one, cutting top-level items from 8 to 5. The bundle page reached a ROAS of 3.7, about 18% above the single-product pages.",
