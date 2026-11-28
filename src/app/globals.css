@@ -176,6 +176,7 @@ a{color:#202329}a:hover{color:#000}
 .cs-vis.lan .slot{aspect-ratio:16/10}
 .cs-vis .slot svg{color:#9A9A92}
 .cs-vis img{display:block;width:100%;height:auto}
+.cs-vis.por img{width:calc(100% - 28px);margin:14px 14px 0;border-radius:18px 18px 0 0;box-shadow:0 0 0 1px rgba(32,35,41,.08)}
 .cs-vis figcaption{padding:10px 14px 12px;font-size:13px;line-height:1.35;color:#5A5A55}
 .cs-hero .cs-vis.por .slot{max-height:420px}
 /* summary */
